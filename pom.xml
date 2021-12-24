@@ -12,7 +12,7 @@
     <artifactId>Maize-Disease-Detection</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Maize-Disease-Detection</name>
-    <description>An api that runs trained deep neural netwoks</description>
+    <description>An api that runs trained deep neural netwok</description>
     <properties>
         <dl4j-master.version>dl4j-master.version>1.0.0-M1.1</dl4j-master.version>
         <!-- Change the nd4j.backend property to nd4j-cuda-X-platform to use CUDA GPUs -->

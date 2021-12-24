@@ -11,7 +11,7 @@ spring:
       minimum-idle: 10
       maximum-pool-size: 50
       idle-timeout: 10000
-      max-lifetime: 1000
+      max-lifetime: 40000
       auto-commit: true
     username: "${env.DB_USER_NAME}"
     password: "${env.DB_PASSWORD}"
