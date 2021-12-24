@@ -31,17 +31,5 @@ public class ApiException {
         this.status = status;
     }
 
-
-    ApiException(HttpStatus status, Throwable ex) {
-        this();
-        this.status = status;
-        this.message = "Unexpected error";
-    }
-
-    ApiException(HttpStatus status, String message) {
-        this();
-        this.status = status;
-        this.message = message;
-    }
 }
 

@@ -2,13 +2,17 @@ package com.detection.maize.disease.user.entity;
 
 
 import com.detection.maize.disease.commons.BaseEntity;
+import com.detection.maize.disease.role.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="users_table")
@@ -29,8 +33,18 @@ public class UserEntity extends BaseEntity {
     String email;
 
     @Column(name="password", length = 200, nullable = false)
+    @JsonIgnore
     String password;
 
     @Column(name="is_active", length = 10)
     boolean isActive;
+
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JoinTable(
+            name="user_roles",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id"))
+    List<Role> roles ;
 }
