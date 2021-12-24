@@ -43,7 +43,7 @@ public class UserEntity extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JoinTable(
-            name="user_roles",
+            name="user_roles_table",
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id"))
     List<Role> roles ;

@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
+@Table(name = "roles_table")
 public class Role extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @NaturalId
