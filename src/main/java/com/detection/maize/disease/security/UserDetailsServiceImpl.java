@@ -15,16 +15,16 @@ import javax.persistence.EntityNotFoundException;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    UserRepository userRepository;
+    final UserRepository userRepository;
 
     public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        UserEntity user = userRepository.findByEmail(userName).orElseThrow(
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("Wrong credentials")
         );
 
