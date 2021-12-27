@@ -46,10 +46,10 @@ public class IssueEntity extends BaseEntity {
     private String imageType;
 
     @Column(name="comment_likes", length = 200)
-    long commentLikes;
+    long issueLikes;
 
     @Column(name="comment_dislikes", length = 200)
-    long commentDislikes;
+    long issueDislike;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, updatable = false)

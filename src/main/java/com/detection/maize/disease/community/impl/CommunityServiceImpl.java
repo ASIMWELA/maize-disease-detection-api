@@ -3,6 +3,7 @@ package com.detection.maize.disease.community.impl;
 import com.detection.maize.disease.community.CommunityService;
 import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.community.hateos.IssueModel;
+import com.detection.maize.disease.community.hateos.IssueModelAssembler;
 import com.detection.maize.disease.community.payload.IssueModelConv;
 import com.detection.maize.disease.community.repository.IssueRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
@@ -14,6 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,10 +36,14 @@ import java.util.Objects;
 public class CommunityServiceImpl implements CommunityService {
     UserRepository userRepository;
     IssueRepository issueRepository;
+    IssueModelAssembler issueModelAssembler;
 
-    public CommunityServiceImpl(UserRepository userRepository, IssueRepository issueRepository) {
+    public CommunityServiceImpl(UserRepository userRepository,
+                                IssueRepository issueRepository,
+                                IssueModelAssembler issueModelAssembler) {
         this.userRepository = userRepository;
         this.issueRepository = issueRepository;
+        this.issueModelAssembler = issueModelAssembler;
     }
 
     @Override
@@ -93,6 +102,14 @@ public class CommunityServiceImpl implements CommunityService {
                 //.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="+ resource.getFilename())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename="+ issueEntity.getImageName())
                 .body(issueEntity.getIssueImage());
+    }
+
+    @Override
+    public ResponseEntity<PagedModel<IssueModel>> getPagedIssueModels(int page, int size, PagedResourcesAssembler<IssueEntity> pagedResourcesAssembler) {
+        Page<IssueEntity> issues = issueRepository.findAll(PageRequest.of(page, size));
+        PagedModel<IssueModel> issueModelPagedModels = pagedResourcesAssembler
+                .toModel(issues, issueModelAssembler);
+        return ResponseEntity.ok(issueModelPagedModels);
     }
 
 

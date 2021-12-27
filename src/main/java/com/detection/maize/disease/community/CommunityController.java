@@ -1,13 +1,19 @@
 package com.detection.maize.disease.community;
 
+import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.community.hateos.IssueModel;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping("/api/v1/community")
@@ -30,6 +36,15 @@ public class CommunityController {
     @GetMapping("/{issueUuid}")
     public ResponseEntity<byte[]> getIssueImageUrl(@PathVariable String issueUuid){
         return communityService.downloadImage(issueUuid);
+    }
+
+    @Transactional
+    @GetMapping("/issues")
+    public ResponseEntity<PagedModel<IssueModel>> getIssues(
+            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
+            @Positive @RequestParam(value = "size", defaultValue = "10")int size,
+            PagedResourcesAssembler<IssueEntity> pagedResourceAssembler){
+        return communityService.getPagedIssueModels(page, size, pagedResourceAssembler);
     }
 
 }
