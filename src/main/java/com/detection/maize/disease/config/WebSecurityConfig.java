@@ -82,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,
                         "/api/v1/users", "/api/v1/auth/login",
-                        "/api/v1/providers"
+                        "/api/v1/community/**"
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.GET,

@@ -4,6 +4,11 @@ app:
     expiration: "${env.JWT_EXPIRATION_M_SECONDS}"
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 30MB
+      max-file-size: 50MB
   datasource:
     url: "${env.DATABASE_URL}"
     hikari:

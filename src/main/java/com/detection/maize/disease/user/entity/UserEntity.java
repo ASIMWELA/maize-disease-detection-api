@@ -2,6 +2,8 @@ package com.detection.maize.disease.user.entity;
 
 
 import com.detection.maize.disease.commons.BaseEntity;
+import com.detection.maize.disease.community.entity.CommentEntity;
+import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,6 +40,18 @@ public class UserEntity extends BaseEntity {
 
     @Column(name="is_active", length = 10)
     boolean isActive;
+
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnore
+    List<IssueEntity> issues;
+
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnore
+    List<CommentEntity> comments;
 
     @ManyToMany
     @LazyCollection(LazyCollectionOption.FALSE)

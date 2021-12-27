@@ -5,6 +5,7 @@ import com.detection.maize.disease.auth.payload.LoginResponse;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Transactional
     ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest){
         return authService.login(loginRequest);
     }

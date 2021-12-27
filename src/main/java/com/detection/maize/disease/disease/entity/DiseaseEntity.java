@@ -1,13 +1,20 @@
 package com.detection.maize.disease.disease.entity;
 
 import com.detection.maize.disease.commons.BaseEntity;
+import com.detection.maize.disease.community.entity.IssueEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name="diseases_table")
@@ -20,4 +27,16 @@ import javax.persistence.Table;
 public class DiseaseEntity extends BaseEntity {
     @Column(name="disease_name", unique = true, length = 200, updatable = false)
     String diseaseName;
+
+    @OneToMany(mappedBy = "disease")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnore
+    List<PrescriptionEntity> prescriptions;
+
+    @OneToMany(mappedBy = "disease")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnore
+    List<SymptomEntity> symptoms;
 }

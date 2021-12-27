@@ -1,15 +1,18 @@
 package com.detection.maize.disease.community.entity;
 
 import com.detection.maize.disease.commons.BaseEntity;
+import com.detection.maize.disease.user.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name="issues_table")
@@ -41,4 +44,22 @@ public class IssueEntity extends BaseEntity {
 
     @Column(name="image_type")
     private String imageType;
+
+    @Column(name="comment_likes", length = 200)
+    long commentLikes;
+
+    @Column(name="comment_dislikes", length = 200)
+    long commentDislikes;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    UserEntity user;
+
+    @OneToMany(mappedBy = "issue")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnore
+    List<CommentEntity> comments;
 }
