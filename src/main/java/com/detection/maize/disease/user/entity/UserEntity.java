@@ -2,7 +2,7 @@ package com.detection.maize.disease.user.entity;
 
 
 import com.detection.maize.disease.commons.BaseEntity;
-import com.detection.maize.disease.community.entity.CommentEntity;
+import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,7 +51,7 @@ public class UserEntity extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
-    List<CommentEntity> comments;
+    List<AnswerEntity> comments;
 
     @ManyToMany
     @LazyCollection(LazyCollectionOption.FALSE)

@@ -29,7 +29,6 @@ public class IssueModelProcessor implements RepresentationModelProcessor<IssueMo
         IssueEntity issueEntity = issueRepository.findByUuid(model.getUuid()).orElseThrow(
                 ()->new EntityNotFoundException("No issue with the id provided")
         );
-
         if(issueEntity.getIssueImage() != null){
             model.add(linkTo(methodOn(CommunityController.class).getIssueImageUrl(issueEntity.getUuid())).withRel("imageUrl"));
         }

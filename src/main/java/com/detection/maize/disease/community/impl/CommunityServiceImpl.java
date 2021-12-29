@@ -1,10 +1,16 @@
 package com.detection.maize.disease.community.impl;
 
 import com.detection.maize.disease.community.CommunityService;
+import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
+import com.detection.maize.disease.community.hateos.AnswerModel;
+import com.detection.maize.disease.community.hateos.AnswerModelAssembler;
 import com.detection.maize.disease.community.hateos.IssueModel;
 import com.detection.maize.disease.community.hateos.IssueModelAssembler;
+import com.detection.maize.disease.community.payload.AnswerRequest;
+import com.detection.maize.disease.community.payload.IssueAnswersDto;
 import com.detection.maize.disease.community.payload.IssueModelConv;
+import com.detection.maize.disease.community.repository.AnswerRepository;
 import com.detection.maize.disease.community.repository.IssueRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
 import com.detection.maize.disease.exception.OperationNotAllowedException;
@@ -29,6 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -37,13 +45,19 @@ public class CommunityServiceImpl implements CommunityService {
     UserRepository userRepository;
     IssueRepository issueRepository;
     IssueModelAssembler issueModelAssembler;
+    AnswerRepository answerRepository;
+    AnswerModelAssembler answerModelAssembler;
 
     public CommunityServiceImpl(UserRepository userRepository,
                                 IssueRepository issueRepository,
-                                IssueModelAssembler issueModelAssembler) {
+                                IssueModelAssembler issueModelAssembler,
+                                AnswerRepository answerRepository,
+                                AnswerModelAssembler answerModelAssembler) {
         this.userRepository = userRepository;
         this.issueRepository = issueRepository;
         this.issueModelAssembler = issueModelAssembler;
+        this.answerRepository = answerRepository;
+        this.answerModelAssembler = answerModelAssembler;
     }
 
     @Override
@@ -60,10 +74,11 @@ public class CommunityServiceImpl implements CommunityService {
         if (file == null) {
             issueEntity = IssueEntity
                     .builder()
-                    .issueDescription(issueModelConv1.getIssueDescription())
-                    .issueName(issueModelConv1.getIssueName())
+                    .questionDescription(issueModelConv1.getQuestionDescription())
+                    .question(issueModelConv1.getQuestion())
                     .createdAt(LocalDate.now())
                     .modifiedAt(LocalDate.now())
+                    .crop(issueModelConv1.getCrop())
                     .uuid(UuidGenerator.generateRandomString(12))
                     .user(userEntity)
                     .build();
@@ -73,25 +88,26 @@ public class CommunityServiceImpl implements CommunityService {
             }
             issueEntity = IssueEntity
                     .builder()
-                    .issueDescription(issueModelConv1.getIssueDescription())
-                    .issueName(issueModelConv1.getIssueName())
+                    .questionDescription(issueModelConv1.getQuestionDescription())
+                    .question(issueModelConv1.getQuestion())
                     .createdAt(LocalDate.now())
                     .modifiedAt(LocalDate.now())
                     .issueImage(file.getBytes())
+                    .crop(issueModelConv1.getCrop())
                     .imageName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())))
                     .imageType(file.getContentType())
                     .uuid(UuidGenerator.generateRandomString(12))
                     .user(userEntity)
                     .build();
         }
-      return new ResponseEntity<>(IssueModel.build(issueRepository.save(issueEntity)), HttpStatus.CREATED);
+        return new ResponseEntity<>(IssueModel.build(issueRepository.save(issueEntity)), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<byte[]> downloadImage(String issueUuid) {
 
         IssueEntity issueEntity = issueRepository.findByUuid(issueUuid).orElseThrow(
-                ()->new RuntimeException("No image with the provided uuid")
+                () -> new RuntimeException("No image with the provided uuid")
         );
 
         MediaType contentType = MediaType.parseMediaType(issueEntity.getImageType());
@@ -100,7 +116,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .contentType(contentType)
                 //for download
                 //.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="+ resource.getFilename())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename="+ issueEntity.getImageName())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + issueEntity.getImageName())
                 .body(issueEntity.getIssueImage());
     }
 
@@ -112,5 +128,27 @@ public class CommunityServiceImpl implements CommunityService {
         return ResponseEntity.ok(issueModelPagedModels);
     }
 
+    @Override
+    public ResponseEntity<IssueAnswersDto> answerIssue(String issueUuid, String userUuid, AnswerRequest answerRequest) {
+        IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
+                () -> new EntityNotFoundException("No issue with the given id")
+        );
+        UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
+                () -> new EntityNotFoundException("No user with the given entity")
+        );
+        AnswerEntity answer = AnswerEntity.builder()
+                .answerContent(answerRequest.getAnswer())
+                .createdAt(LocalDate.now())
+                .modifiedAt(LocalDate.now())
+                .uuid(UuidGenerator.generateRandomString(12))
+                .user(user)
+                .issue(issue)
+                .build();
+        answerRepository.save(answer);
+        return ResponseEntity.ok(IssueAnswersDto.builder()
+                .issue(IssueModel.build(issue))
+                .answers(answerModelAssembler.toCollectionModel(issue.getAnswers()).getContent())
+                .build());
+    }
 
 }

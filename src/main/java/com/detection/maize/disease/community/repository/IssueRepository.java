@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface IssueRepository extends JpaRepository<IssueEntity, Long> {
-    Optional<IssueEntity> findByIssueName(String issueName);
+    Optional<IssueEntity> findByQuestion(String issueName);
     Optional<IssueEntity>  findByUuid(String issueUuid);
 }

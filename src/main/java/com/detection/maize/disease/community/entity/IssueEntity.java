@@ -24,10 +24,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IssueEntity extends BaseEntity {
     @Column(name="issue_name", length = 200, nullable = false, unique = true)
-    String issueName;
+    String question;
 
-    @Column(name="issue_description", length = 800, nullable = false, unique = true)
-    String issueDescription;
+    @Column(name="issue_description", length = 2000, nullable = false, unique = true)
+    String questionDescription;
+
+    @Column(name="crop", length = 300)
+    String crop;
 
     @Column(name="created_at", nullable = false)
     LocalDate createdAt;
@@ -45,10 +48,10 @@ public class IssueEntity extends BaseEntity {
     @Column(name="image_type")
     private String imageType;
 
-    @Column(name="comment_likes", length = 200)
+    @Column(name="issue_likes", length = 200)
     long issueLikes;
 
-    @Column(name="comment_dislikes", length = 200)
+    @Column(name="issue_dislikes", length = 200)
     long issueDislike;
 
     @ManyToOne
@@ -61,5 +64,5 @@ public class IssueEntity extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
-    List<CommentEntity> comments;
+    List<AnswerEntity> answers;
 }

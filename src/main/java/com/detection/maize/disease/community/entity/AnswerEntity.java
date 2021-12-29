@@ -13,22 +13,22 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="comments_table")
+@Table(name="answers_table")
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentEntity extends BaseEntity {
-    @Column(name="comment_content", length = 800, nullable = false)
-    String commentContent;
+public class AnswerEntity extends BaseEntity {
+    @Column(name="answer_content", length = 800, nullable = false)
+    String answerContent;
 
-    @Column(name="comment_likes", length = 200)
-    long commentLikes;
+    @Column(name="answer_likes", length = 200)
+    long answerLikes;
 
-    @Column(name="comment_dislikes", length = 200)
-    long commentDislikes;
+    @Column(name="answer_dislikes", length = 200)
+    long answerDislikes;
 
     @Column(name="created_at", length = 200, nullable = false)
     LocalDate createdAt;
