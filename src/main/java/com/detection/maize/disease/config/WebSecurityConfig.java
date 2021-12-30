@@ -102,7 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                 .permitAll()
-                .anyRequest().authenticated();
+                .anyRequest()
+                //TODO: ALLOWS ALL THE REQUEST, CHANGE TO AUTHENTICATED
+                .permitAll();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

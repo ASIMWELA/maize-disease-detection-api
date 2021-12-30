@@ -1,5 +1,6 @@
 package com.detection.maize.disease.community.hateos;
 
+import com.detection.maize.disease.commons.Constants;
 import com.detection.maize.disease.community.CommunityController;
 import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.community.repository.IssueRepository;
@@ -30,7 +31,10 @@ public class IssueModelProcessor implements RepresentationModelProcessor<IssueMo
                 ()->new EntityNotFoundException("No issue with the id provided")
         );
         if(issueEntity.getIssueImage() != null){
-            model.add(linkTo(methodOn(CommunityController.class).getIssueImageUrl(issueEntity.getUuid())).withRel("imageUrl"));
+            model.add(linkTo(methodOn(CommunityController.class).getIssueImageUrl(model.getUuid())).withRel("imageUrl"));
+        }
+        if(issueEntity.getAnswers() != null){
+            model.add(linkTo(methodOn(CommunityController.class).getAnswers(Constants.PAGE, Constants.SIZE, null, model.getUuid())).withRel("issueAnswers"));
         }
         return model;
     }

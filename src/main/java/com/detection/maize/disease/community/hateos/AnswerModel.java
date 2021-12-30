@@ -30,6 +30,8 @@ import static lombok.AccessLevel.PRIVATE;
 public class AnswerModel extends RepresentationModel<AnswerModel> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String answerContent;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String answerBy;
     long answerLikes;
     long answerDislikes;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -42,6 +44,7 @@ public class AnswerModel extends RepresentationModel<AnswerModel> {
                 .answerContent(answerEntity.getAnswerContent())
                 .createdAt(answerEntity.getCreatedAt())
                 .answerLikes(answerEntity.getAnswerLikes())
+                .answerBy(answerEntity.getUser().getFirstName()+" "+answerEntity.getUser().getLastName())
                 .answerDislikes(answerEntity.getAnswerDislikes())
                 .uuid(answerEntity.getUuid())
                 .build();

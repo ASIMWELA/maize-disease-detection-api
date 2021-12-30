@@ -1,6 +1,8 @@
 package com.detection.maize.disease.community;
 
+import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
+import com.detection.maize.disease.community.hateos.AnswerModel;
 import com.detection.maize.disease.community.hateos.IssueModel;
 import com.detection.maize.disease.community.payload.AnswerRequest;
 import com.detection.maize.disease.community.payload.IssueAnswersDto;
@@ -31,33 +33,47 @@ public class CommunityController {
 
     @Transactional
     @PostMapping("/post-issue/{userUuid}")
-    public ResponseEntity<IssueModel> postAnIssue(@RequestParam(name="image", required = false) MultipartFile image, @RequestParam(name="issue", required = true)String issueModel, @PathVariable("userUuid") String userUuid){
+    public ResponseEntity<IssueModel> postAnIssue(@RequestParam(name = "image", required = false) MultipartFile image, @RequestParam(name = "issue", required = true) String issueModel, @PathVariable("userUuid") String userUuid) {
         return communityService.createIssue(image, issueModel, userUuid);
     }
 
     @Transactional
     @GetMapping("/{issueUuid}")
-    public ResponseEntity<byte[]> getIssueImageUrl(@PathVariable String issueUuid){
+    public ResponseEntity<byte[]> getIssueImageUrl(@PathVariable String issueUuid) {
         return communityService.downloadImage(issueUuid);
     }
 
     @Transactional
     @GetMapping("/issues")
-    public ResponseEntity<PagedModel<IssueModel>> getIssues(
+    public ResponseEntity<PagedModel<?>> getIssues(
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
-            @Positive @RequestParam(value = "size", defaultValue = "10")int size,
-            PagedResourcesAssembler<IssueEntity> pagedResourceAssembler){
+            @Positive @RequestParam(value = "size", defaultValue = "20") int size,
+            PagedResourcesAssembler<IssueEntity> pagedResourceAssembler) {
         return communityService.getPagedIssueModels(page, size, pagedResourceAssembler);
     }
+
+
+    @Transactional
+    @GetMapping("/answers/{issueUuid}")
+    public ResponseEntity<PagedModel<?>> getAnswers(
+            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
+            @Positive @RequestParam(value = "size", defaultValue = "20") int size,
+            PagedResourcesAssembler<AnswerEntity> pagedResourceAssembler,
+            @PathVariable("issueUuid") String issueUuid) {
+        return communityService.getIssueAnswers(issueUuid, page, size, pagedResourceAssembler);
+    }
+
     //TODO : test the end point: for next day
     @Transactional
     @PostMapping("/issues/answer/{issueUuid}/{userUuid}")
-    public ResponseEntity<IssueAnswersDto> answerAnIssue(
+    public ResponseEntity<PagedModel<?>> answerAnIssue(
             @PathVariable("issueUuid") String issueUuid,
             @PathVariable("userUuid") String userUuid,
-            @Valid AnswerRequest answerRequest
-            ){
-        return communityService.answerIssue(issueUuid, userUuid, answerRequest);
+            @Valid @RequestBody AnswerRequest answerRequest,
+            @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
+            @Positive @RequestParam(value = "size", defaultValue = "20") int size,
+            PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        return communityService.answerIssue(issueUuid, userUuid, answerRequest, page, size, pagedResourcesAssembler);
     }
 
 }

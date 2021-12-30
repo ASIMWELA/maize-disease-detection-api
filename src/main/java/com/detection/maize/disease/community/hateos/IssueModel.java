@@ -48,13 +48,17 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     long issueAnswers;
     public static IssueModel build(IssueEntity entity){
         String createdBy = entity.getUser().getFirstName() + " " + entity.getUser().getLastName();
+        int numberOfAnswers = 0;
+        if(entity.getAnswers() != null){
+            numberOfAnswers = entity.getAnswers().size();
+        }
         return IssueModel.builder()
                 .issueDislikes(entity.getIssueDislike())
                 .issueLikes(entity.getIssueLikes())
                 .question(entity.getQuestion())
                 .createdBy(createdBy)
                 .crop(entity.getCrop())
-                .issueAnswers(entity.getAnswers().size())
+                .issueAnswers(numberOfAnswers)
                 .questionDescription(entity.getQuestionDescription())
                 .uuid(entity.getUuid())
                 .createdAt(entity.getCreatedAt())

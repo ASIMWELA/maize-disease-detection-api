@@ -17,17 +17,17 @@ public class DbInit {
     CommandLineRunner init(RoleRepository roleRepository){
         return args -> {
             //clean slate
-            roleRepository.deleteAll();
-
-            //reinitialize
-            Role roleUser = new Role();
-            roleUser.setName(ERole.ROLE_USER);
-            roleUser.setUuid("gjsklport42n");
-
-            Role roleAdmin = new Role();
-            roleAdmin.setName(ERole.ROLE_ADMIN);
-            roleAdmin.setUuid("gjsklportghn");
-            roleRepository.saveAll(Stream.of(roleAdmin, roleUser).collect(Collectors.toList()));
+//            roleRepository.deleteAll();
+//
+//            //reinitialize
+//            Role roleUser = new Role();
+//            roleUser.setName(ERole.ROLE_USER);
+//            roleUser.setUuid("gjsklport42n");
+//
+//            Role roleAdmin = new Role();
+//            roleAdmin.setName(ERole.ROLE_ADMIN);
+//            roleAdmin.setUuid("gjsklportghn");
+//            roleRepository.saveAll(Stream.of(roleAdmin, roleUser).collect(Collectors.toList()));
 
         };
     }
