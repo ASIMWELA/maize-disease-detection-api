@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DiseaseEntity extends BaseEntity {
     @Column(name="disease_name", unique = true, length = 200, updatable = false)
+    @NotEmpty(message = "Disease name cannot be empty")
     String diseaseName;
 
     @OneToMany(mappedBy = "disease")

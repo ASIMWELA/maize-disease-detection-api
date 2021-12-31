@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface DiseaseRepository extends JpaRepository<DiseaseEntity, Long> {
     Optional<DiseaseEntity> findByDiseaseName(String diseaseName);
     Optional<DiseaseEntity> findByUuid(String diseaseUuid);
+    boolean existsByDiseaseName(String diseaseName);
 }

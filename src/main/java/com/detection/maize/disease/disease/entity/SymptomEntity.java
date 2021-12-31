@@ -9,6 +9,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name="symptoms_table")
@@ -20,6 +21,7 @@ import javax.persistence.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SymptomEntity extends BaseEntity {
     @Column(name="symptom_description", unique = true, length = 800, nullable = false)
+    @NotEmpty(message="Symptom cannot be empty")
     String symptomDescription;
 
     @ManyToOne

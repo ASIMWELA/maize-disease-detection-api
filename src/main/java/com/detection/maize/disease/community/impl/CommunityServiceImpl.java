@@ -121,13 +121,10 @@ public class CommunityServiceImpl implements CommunityService {
     public ResponseEntity<PagedModel<?>> getPagedIssueModels(int page, int size, PagedResourcesAssembler<IssueEntity> pagedResourcesAssembler) {
         Page<IssueEntity> issues = issueRepository.findAll(PageRequest.of(page, size));
         if (issues.hasContent()) {
-            PagedModel<IssueModel> issueModelPagedModels = pagedResourcesAssembler
-                    .toModel(issues, issueModelAssembler);
-            return ResponseEntity.ok(issueModelPagedModels);
-        } else {
-            PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(issues, IssueModel.class);
-            return ResponseEntity.ok(objects);
+            return ResponseEntity.ok(pagedResourcesAssembler
+                    .toModel(issues, issueModelAssembler));
         }
+        return ResponseEntity.ok(pagedResourcesAssembler.toEmptyModel(issues, IssueModel.class));
     }
 
     @Override
@@ -138,7 +135,7 @@ public class CommunityServiceImpl implements CommunityService {
         UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
                 () -> new EntityNotFoundException("No user with the given entity")
         );
-        if(issue.getUser().getEmail().equals(user.getEmail())){
+        if (issue.getUser().getEmail().equals(user.getEmail())) {
             throw new OperationNotAllowedException("You cannot answer to your own created issue");
         }
         AnswerEntity answer = AnswerEntity.builder()
@@ -159,15 +156,11 @@ public class CommunityServiceImpl implements CommunityService {
                 () -> new EntityNotFoundException("No issue with  the provided id")
         );
         Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size));
-
         if (answers.hasContent()) {
-            PagedModel<AnswerModel> answerPagedModels = pagedResourcesAssembler
-                    .toModel(answers, answerModelAssembler);
-            return ResponseEntity.ok(answerPagedModels);
-        } else {
-            PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class);
-            return ResponseEntity.ok(objects);
+            return ResponseEntity.ok(pagedResourcesAssembler
+                    .toModel(answers, answerModelAssembler));
         }
+        return ResponseEntity.ok(pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class));
     }
 
 }
