@@ -7,6 +7,7 @@ import com.detection.maize.disease.disease.entity.PrescriptionEntity;
 import com.detection.maize.disease.disease.entity.SymptomEntity;
 import com.detection.maize.disease.disease.heteos.DiseaseModel;
 import com.detection.maize.disease.disease.heteos.DiseaseModelAssembler;
+import com.detection.maize.disease.disease.payload.AddSymptomRequest;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.disease.repositoy.PrescriptionRepository;
 import com.detection.maize.disease.disease.repositoy.SymptomRepository;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -54,33 +56,41 @@ public class DiseaseServiceImpl implements DiseaseService {
         return new ResponseEntity<>(ApiResponse.builder().success(true).message("disease saved").build(), HttpStatus.CREATED);
     }
 
-
-    //TODO: create end points
-    @Override
-    public ResponseEntity<ApiResponse> addDiseaseSymptoms(String diseaseUuid, List<SymptomEntity> symptoms) {
+    public ResponseEntity<ApiResponse> addDiseaseSymptoms(String diseaseUuid, AddSymptomRequest symptoms) {
         DiseaseEntity disease = diseaseRepository.findByUuid(diseaseUuid).orElseThrow(
                 () -> new EntityNotFoundException("No disease found with the given identifier")
         );
-        if (symptoms.isEmpty()) {
+        if (symptoms.getSymptoms() == null) {
             throw new OperationNotAllowedException("Symptoms cannot be empty");
         }
-        symptoms.forEach(symptom -> {
-            if (disease.getSymptoms() != null) {
-                //check is the symptom is already added
-                disease.getSymptoms().forEach(sym -> {
+        if (symptoms.getSymptoms().isEmpty()) {
+            throw new OperationNotAllowedException("Symptoms cannot be empty");
+        }
+        List<SymptomEntity> diseaseSym = disease.getSymptoms();
+
+        for (SymptomEntity symptom : symptoms.getSymptoms()) {
+            //check is the symptom is already added
+            if (diseaseSym.isEmpty()) {
+                SymptomEntity symptomEntity = SymptomEntity.builder().symptomDescription(symptom.getSymptomDescription())
+                        .uuid(UuidGenerator.generateRandomString(12))
+                        .disease(disease)
+                        .build();
+                symptomRepository.save(symptomEntity);
+            } else {
+                for (SymptomEntity sym : diseaseSym) {
                     if (sym.getSymptomDescription().equals(symptom.getSymptomDescription())) {
                         throw new OperationNotAllowedException("Symptom already added");
-                    } else {
-                        symptom.setDisease(disease);
-                        symptomRepository.save(symptom);
                     }
-                });
-            } else {
-                symptom.setDisease(disease);
-                symptomRepository.save(symptom);
+                }
+                SymptomEntity symptomEntity = SymptomEntity.builder().symptomDescription(symptom.getSymptomDescription())
+                        .uuid(UuidGenerator.generateRandomString(12))
+                        .disease(disease)
+                        .build();
+                symptomRepository.save(symptomEntity);
             }
-        });
+        }
         return ResponseEntity.ok(ApiResponse.builder().success(true).message("Symptoms added").build());
+
     }
 
     //TODO: create end points

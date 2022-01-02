@@ -15,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,11 +35,11 @@ public class DiseaseEntity extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
-    List<PrescriptionEntity> prescriptions;
+    List<PrescriptionEntity> prescriptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "disease")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
-    List<SymptomEntity> symptoms;
+    List<SymptomEntity> symptoms = new ArrayList<>();
 }
