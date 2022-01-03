@@ -5,6 +5,7 @@ import com.detection.maize.disease.community.entity.IssueEntity;
 import com.detection.maize.disease.disease.entity.DiseaseEntity;
 import com.detection.maize.disease.disease.entity.PrescriptionEntity;
 import com.detection.maize.disease.disease.entity.SymptomEntity;
+import com.detection.maize.disease.disease.payload.AddPrescriptionRequest;
 import com.detection.maize.disease.disease.payload.AddSymptomRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -50,7 +51,7 @@ public class DiseaseController {
     }
 
     @PostMapping("/prescriptions/{diseaseUuid}")
-    public ResponseEntity<ApiResponse> addDiseasePrescription(@PathVariable String diseaseUuid, @RequestBody List<PrescriptionEntity> prescriptions) {
+    public ResponseEntity<ApiResponse> addDiseasePrescription(@PathVariable String diseaseUuid, @RequestBody AddPrescriptionRequest prescriptions) {
         return diseaseService.addDiseasePrescriptions(diseaseUuid, prescriptions);
     }
 }

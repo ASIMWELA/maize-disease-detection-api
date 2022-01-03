@@ -7,6 +7,7 @@ import com.detection.maize.disease.disease.entity.PrescriptionEntity;
 import com.detection.maize.disease.disease.entity.SymptomEntity;
 import com.detection.maize.disease.disease.heteos.DiseaseModel;
 import com.detection.maize.disease.disease.heteos.DiseaseModelAssembler;
+import com.detection.maize.disease.disease.payload.AddPrescriptionRequest;
 import com.detection.maize.disease.disease.payload.AddSymptomRequest;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.disease.repositoy.PrescriptionRepository;
@@ -93,32 +94,45 @@ public class DiseaseServiceImpl implements DiseaseService {
 
     }
 
-    //TODO: create end points
     @Override
-    public ResponseEntity<ApiResponse> addDiseasePrescriptions(String diseaseUuid, List<PrescriptionEntity> prescriptions) {
+    public ResponseEntity<ApiResponse> addDiseasePrescriptions(String diseaseUuid, AddPrescriptionRequest prescriptions) {
         DiseaseEntity disease = diseaseRepository.findByUuid(diseaseUuid).orElseThrow(
                 () -> new EntityNotFoundException("No disease found with the given identifier")
         );
-        if (prescriptions.isEmpty()) {
+        if (prescriptions.getPrescriptions() == null) {
             throw new OperationNotAllowedException("Prescriptions cannot be empty");
         }
-        prescriptions.forEach(prescription -> {
-            if (disease.getPrescriptions() != null) {
-                //check is the symptom is already added
-                disease.getPrescriptions().forEach(presc -> {
+
+        if (prescriptions.getPrescriptions().isEmpty()) {
+            throw new OperationNotAllowedException("Prescriptions cannot be empty");
+        }
+
+        List<PrescriptionEntity> diseasePresc = disease.getPrescriptions();
+
+        for (PrescriptionEntity prescription : prescriptions.getPrescriptions()) {
+            //check is the symptom is already added
+            if (diseasePresc.isEmpty()) {
+                PrescriptionEntity prescriptionEntity = PrescriptionEntity.builder()
+                        .diseasePrescription(prescription.getDiseasePrescription())
+                        .uuid(UuidGenerator.generateRandomString(12))
+                        .disease(disease)
+                        .build();
+                prescriptionRepository.save(prescriptionEntity);
+            } else {
+                for (PrescriptionEntity presc : diseasePresc) {
                     if (presc.getDiseasePrescription().equals(prescription.getDiseasePrescription())) {
                         throw new OperationNotAllowedException("Symptom already added");
-                    } else {
-                        prescription.setDisease(disease);
-                        prescriptionRepository.save(prescription);
                     }
-                });
-            } else {
-                prescription.setDisease(disease);
-                prescriptionRepository.save(prescription);
+                }
+                PrescriptionEntity prescriptionEntity2 = PrescriptionEntity.builder()
+                        .diseasePrescription(prescription.getDiseasePrescription())
+                        .uuid(UuidGenerator.generateRandomString(12))
+                        .disease(disease)
+                        .build();
+                prescriptionRepository.save(prescriptionEntity2);
             }
-        });
-        return ResponseEntity.ok(ApiResponse.builder().success(true).message("Symptoms added").build());
+        }
+        return ResponseEntity.ok(ApiResponse.builder().success(true).message("Prescriptions added").build());
     }
 
     @Override
