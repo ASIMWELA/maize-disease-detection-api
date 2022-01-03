@@ -24,7 +24,7 @@ import static lombok.AccessLevel.PRIVATE;
                 "answerLikes",
                 "answerDislikes",
                 "createdAt",
-                 "answerContent"}
+                "answerContent"}
 )
 @Relation(itemRelation = "answer", collectionRelation = "answers")
 public class AnswerModel extends RepresentationModel<AnswerModel> {
@@ -39,12 +39,12 @@ public class AnswerModel extends RepresentationModel<AnswerModel> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     LocalDate createdAt;
 
-    public static AnswerModel buildAnswerModel(AnswerEntity answerEntity){
+    public static AnswerModel buildAnswerModel(AnswerEntity answerEntity) {
         return AnswerModel.builder()
                 .answerContent(answerEntity.getAnswerContent())
                 .createdAt(answerEntity.getCreatedAt())
                 .answerLikes(answerEntity.getAnswerLikes())
-                .answerBy(answerEntity.getUser().getFirstName()+" "+answerEntity.getUser().getLastName())
+                .answerBy(answerEntity.getUser().getFirstName() + " " + answerEntity.getUser().getLastName())
                 .answerDislikes(answerEntity.getAnswerDislikes())
                 .uuid(answerEntity.getUuid())
                 .build();

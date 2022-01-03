@@ -1,5 +1,7 @@
 package com.detection.maize.disease.community.impl;
 
+import com.detection.maize.disease.commons.Constants;
+import com.detection.maize.disease.community.CommunityController;
 import com.detection.maize.disease.community.CommunityService;
 import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
@@ -35,6 +37,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.time.LocalDate;
 import java.util.Objects;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -157,10 +162,13 @@ public class CommunityServiceImpl implements CommunityService {
         );
         Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size));
         if (answers.hasContent()) {
-            return ResponseEntity.ok(pagedResourcesAssembler
-                    .toModel(answers, answerModelAssembler));
+            PagedModel<AnswerModel> answerModels = pagedResourcesAssembler.toModel(answers, answerModelAssembler);
+            answerModels.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
+            return ResponseEntity.ok(answerModels);
         }
-        return ResponseEntity.ok(pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class));
+        PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class);
+        objects.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
+        return ResponseEntity.ok(objects);
     }
 
 }

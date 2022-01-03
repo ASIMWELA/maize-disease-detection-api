@@ -2,10 +2,8 @@ package com.detection.maize.disease.community;
 
 import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
-import com.detection.maize.disease.community.hateos.AnswerModel;
 import com.detection.maize.disease.community.hateos.IssueModel;
 import com.detection.maize.disease.community.payload.AnswerRequest;
-import com.detection.maize.disease.community.payload.IssueAnswersDto;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;

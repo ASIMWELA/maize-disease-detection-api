@@ -2,10 +2,8 @@ package com.detection.maize.disease.community;
 
 import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
-import com.detection.maize.disease.community.hateos.AnswerModel;
 import com.detection.maize.disease.community.hateos.IssueModel;
 import com.detection.maize.disease.community.payload.AnswerRequest;
-import com.detection.maize.disease.community.payload.IssueAnswersDto;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -63,7 +61,6 @@ public class CommunityController {
         return communityService.getIssueAnswers(issueUuid, page, size, pagedResourceAssembler);
     }
 
-    //TODO : test the end point: for next day
     @Transactional
     @PostMapping("/issues/answer/{issueUuid}/{userUuid}")
     public ResponseEntity<PagedModel<?>> answerAnIssue(
