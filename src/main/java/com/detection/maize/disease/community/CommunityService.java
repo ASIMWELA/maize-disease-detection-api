@@ -18,4 +18,6 @@ public interface CommunityService {
                                                         int page, int size,
                                                         PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
     ResponseEntity<PagedModel<?>> getIssueAnswers(String issueUuid, int page, int size, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
+    ResponseEntity<IssueModel> upVoteAnIssue(String issueUuid, String userUuid);
+    ResponseEntity<IssueModel> downVoteAnIssue(String issueUuid, String userUuid);
 }

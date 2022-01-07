@@ -73,4 +73,16 @@ public class CommunityController {
         return communityService.answerIssue(issueUuid, userUuid, answerRequest, page, size, pagedResourcesAssembler);
     }
 
+    @PutMapping("/issues/up-vote/{issueUuid}/{userUuid}")
+    @Transactional
+    public ResponseEntity<IssueModel> upVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid){
+        return communityService.upVoteAnIssue(issueUuid, userUuid);
+    }
+
+    @PutMapping("/issues/down-vote/{issueUuid}/{userUuid}")
+    @Transactional
+    public ResponseEntity<IssueModel> downVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid){
+        return communityService.downVoteAnIssue(issueUuid, userUuid);
+    }
+
 }

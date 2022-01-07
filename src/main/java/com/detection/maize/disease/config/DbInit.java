@@ -16,7 +16,7 @@ public class DbInit {
     @Bean
     CommandLineRunner init(RoleRepository roleRepository){
         return args -> {
-            //clean slate
+           // clean slate
 //            roleRepository.deleteAll();
 //
 //            //reinitialize

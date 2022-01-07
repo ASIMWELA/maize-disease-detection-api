@@ -20,15 +20,15 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE)
 @JsonPropertyOrder(
         {"uuid",
-        "question",
-        "crop",
-        "createdBy",
-        "createdAt",
-        "issueLikes",
-        "issueDislikes",
-        "issueAnswers",
-        "issueDescription"}
-        )
+                "question",
+                "crop",
+                "createdBy",
+                "createdAt",
+                "issueLikes",
+                "issueDislikes",
+                "issueAnswers",
+                "issueDescription"}
+)
 @Relation(itemRelation = "issue", collectionRelation = "issues")
 public class IssueModel extends RepresentationModel<IssueModel> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -43,18 +43,23 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     String crop;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     LocalDate createdAt;
-    long issueLikes;
+    long issueLikes = 0;
     long issueDislikes;
     long issueAnswers;
-    public static IssueModel build(IssueEntity entity){
+
+    public static IssueModel build(IssueEntity entity) {
         String createdBy = entity.getUser().getFirstName() + " " + entity.getUser().getLastName();
         int numberOfAnswers = 0;
-        if(entity.getAnswers() != null){
+        long issueUpVotes = 0;
+        if (entity.getAnswers() != null) {
             numberOfAnswers = entity.getAnswers().size();
         }
+
+        if (entity.getIssueVotes() != null) {
+            issueUpVotes = entity.getIssueVotes().size();
+        }
         return IssueModel.builder()
-                .issueDislikes(entity.getIssueDislike())
-                .issueLikes(entity.getIssueLikes())
+                .issueLikes(issueUpVotes)
                 .question(entity.getQuestion())
                 .createdBy(createdBy)
                 .crop(entity.getCrop())

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -36,12 +37,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommunityServiceImpl implements CommunityService {
     UserRepository userRepository;
@@ -169,6 +175,91 @@ public class CommunityServiceImpl implements CommunityService {
         PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class);
         objects.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
         return ResponseEntity.ok(objects);
+    }
+
+    @Override
+    public ResponseEntity<IssueModel> upVoteAnIssue(String issueUuid, String userUuid) {
+
+        IssueEntity issueEntity = issueRepository.findByUuid(issueUuid).orElseThrow(
+                () -> new EntityNotFoundException("No issue found with the given identifier")
+        );
+        UserEntity userEntity = userRepository.findByUuid(userUuid).orElseThrow(
+                () -> new EntityNotFoundException("No user found with the given identifier")
+        );
+        if (issueEntity.getUser().getUuid().equals(userEntity.getUuid())) {
+            throw new OperationNotAllowedException("You cannot vote on your own issue");
+        }
+        List<UserEntity> issueDislikes = issueEntity.getIssueDislikes();
+
+        List<UserEntity> issueVoters = issueEntity.getIssueVotes();
+        issueVoters.forEach(user -> {
+            if (user.getUuid().equals(userUuid)) {
+                throw new OperationNotAllowedException("You have already voted on this issue");
+            }
+        });
+        log.info(String.valueOf(issueDislikes.size()));
+        //if the user disliked the issue, remove him/her
+        issueDislikes.forEach(userEntity1 -> {
+            if(userEntity1.getUuid().equals(userEntity.getUuid())){
+                issueDislikes.remove(userEntity);
+                log.info(String.valueOf(issueDislikes.size()));
+                issueEntity.setIssueDislikes(issueDislikes);
+                issueRepository.save(issueEntity);
+            }
+        });
+
+        if (issueVoters.isEmpty()) {
+            issueEntity.setIssueVotes(Stream.of(userEntity).collect(Collectors.toList()));
+            issueRepository.save(issueEntity);
+            return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
+        }
+
+        issueVoters.add(userEntity);
+        issueEntity.setIssueVotes(issueVoters);
+        return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
+    }
+
+    @Override
+    public ResponseEntity<IssueModel> downVoteAnIssue(String issueUuid, String userUuid) {
+        UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
+                () -> new EntityNotFoundException("No user with the given identity")
+        );
+
+        IssueEntity issueEntity = issueRepository.findByUuid(issueUuid).orElseThrow(
+                () -> new EntityNotFoundException("No Issue with the given identity")
+        );
+        if (issueEntity.getUser().getUuid().equals(user.getUuid())) {
+            throw new OperationNotAllowedException("You cannot dislike your own issue");
+        }
+
+
+        //TODO : IMPLEMENT A LIKE AND DISLIKE
+        List<UserEntity> issueDislikes = issueEntity.getIssueDislikes();
+        List<UserEntity> issueLikes = issueEntity.getIssueVotes();
+       // issueEntity.setIssueVotes(new ArrayList<>());
+
+        issueLikes.forEach(userEntity1->{
+            if(userEntity1.getUuid().equals(user.getUuid())){
+                issueDislikes.remove(user);
+                issueEntity.setIssueVotes(issueDislikes);
+                issueRepository.save(issueEntity);
+            }
+        });
+
+        if (issueDislikes.isEmpty()) {
+            issueEntity.setIssueDislikes(Stream.of(user).collect(Collectors.toList()));
+            issueRepository.save(issueEntity);
+            return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
+        }
+        issueDislikes.forEach(userEntity -> {
+            if (userEntity.getUuid().equals(userUuid)) {
+                throw new OperationNotAllowedException("You have already voted on this issue");
+            }
+        });
+        issueDislikes.remove(user);
+        issueEntity.setIssueDislikes(issueDislikes);
+
+        return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 
 }

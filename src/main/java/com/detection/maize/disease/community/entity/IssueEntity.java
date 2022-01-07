@@ -12,6 +12,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,12 +49,6 @@ public class IssueEntity extends BaseEntity {
     @Column(name="image_type")
     private String imageType;
 
-    @Column(name="issue_likes", length = 200)
-    long issueLikes;
-
-    @Column(name="issue_dislikes", length = 200)
-    long issueDislike;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -65,4 +60,22 @@ public class IssueEntity extends BaseEntity {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
     List<AnswerEntity> answers;
+
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.TRUE)
+    @JsonIgnore
+    @JoinTable(
+            name="user_issue_votes_table",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="issue_id"))
+    List<UserEntity> issueVotes = new ArrayList<>();
+
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.TRUE)
+    @JsonIgnore
+    @JoinTable(
+            name="user_issue_dislikes_table",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="issue_id"))
+    List<UserEntity> issueDislikes = new ArrayList<>();
 }

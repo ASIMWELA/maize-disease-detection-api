@@ -28,7 +28,7 @@ spring:
       hibernate:
         format_sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view:  false
   jackson:
     serialization:
@@ -44,3 +44,8 @@ server:
     include-binding-errors: always
     include-exception: false
     include-stacktrace: on_param
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, env, beans, mappings
