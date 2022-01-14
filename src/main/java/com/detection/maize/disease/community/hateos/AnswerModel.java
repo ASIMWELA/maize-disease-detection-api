@@ -9,6 +9,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -37,7 +38,7 @@ public class AnswerModel extends RepresentationModel<AnswerModel> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String uuid;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    LocalDate createdAt;
+    Date createdAt;
 
     public static AnswerModel buildAnswerModel(AnswerEntity answerEntity) {
         return AnswerModel.builder()

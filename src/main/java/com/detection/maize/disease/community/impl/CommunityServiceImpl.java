@@ -25,6 +25,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
@@ -38,8 +39,11 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,13 +88,23 @@ public class CommunityServiceImpl implements CommunityService {
                     .builder()
                     .questionDescription(issueModelConv1.getQuestionDescription())
                     .question(issueModelConv1.getQuestion())
-                    .createdAt(LocalDate.now())
-                    .modifiedAt(LocalDate.now())
+                    .createdAt(new Date())
+                    .modifiedAt(new Date())
                     .crop(issueModelConv1.getCrop())
                     .uuid(UuidGenerator.generateRandomString(12))
                     .user(userEntity)
                     .build();
         } else {
+
+            //check it 8is really an image
+            String regex
+                    = "([^\\s]+(\\.(?i)(jpg|png|bmp|gif))$)";
+            Pattern p = Pattern.compile(regex);
+            log.info(file.getContentType());
+            Matcher m = p.matcher(Objects.requireNonNull(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()))));
+            if (!m.matches()) {
+                throw new OperationNotAllowedException("The file is not an image, allowed image extensions[jpeg|png|gif|bmp]");
+            }
             if (ImageIO.read(file.getInputStream()) == null) {
                 throw new OperationNotAllowedException("The file is not an image");
             }
@@ -98,8 +112,8 @@ public class CommunityServiceImpl implements CommunityService {
                     .builder()
                     .questionDescription(issueModelConv1.getQuestionDescription())
                     .question(issueModelConv1.getQuestion())
-                    .createdAt(LocalDate.now())
-                    .modifiedAt(LocalDate.now())
+                    .createdAt(new Date())
+                    .modifiedAt(new Date())
                     .issueImage(file.getBytes())
                     .crop(issueModelConv1.getCrop())
                     .imageName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())))
@@ -130,7 +144,8 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public ResponseEntity<PagedModel<?>> getPagedIssueModels(int page, int size, PagedResourcesAssembler<IssueEntity> pagedResourcesAssembler) {
-        Page<IssueEntity> issues = issueRepository.findAll(PageRequest.of(page, size));
+        Page<IssueEntity> issues = issueRepository.findAll(PageRequest.of(page, size, Sort.by("id").descending()));
+
         if (issues.hasContent()) {
             return ResponseEntity.ok(pagedResourcesAssembler
                     .toModel(issues, issueModelAssembler));
@@ -151,8 +166,8 @@ public class CommunityServiceImpl implements CommunityService {
         }
         AnswerEntity answer = AnswerEntity.builder()
                 .answerContent(answerRequest.getAnswer())
-                .createdAt(LocalDate.now())
-                .modifiedAt(LocalDate.now())
+                .createdAt(new Date())
+                .modifiedAt(new Date())
                 .uuid(UuidGenerator.generateRandomString(12))
                 .user(user)
                 .issue(issue)
@@ -166,7 +181,7 @@ public class CommunityServiceImpl implements CommunityService {
         IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
                 () -> new EntityNotFoundException("No issue with  the provided id")
         );
-        Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size));
+        Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size,Sort.by("id").descending()));
         if (answers.hasContent()) {
             PagedModel<AnswerModel> answerModels = pagedResourcesAssembler.toModel(answers, answerModelAssembler);
             answerModels.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
@@ -189,33 +204,26 @@ public class CommunityServiceImpl implements CommunityService {
         if (issueEntity.getUser().getUuid().equals(userEntity.getUuid())) {
             throw new OperationNotAllowedException("You cannot vote on your own issue");
         }
-        List<UserEntity> issueDislikes = issueEntity.getIssueDislikes();
-
+        List<UserEntity> issueDislikes = issueEntity.getIssueDownVotes();
         List<UserEntity> issueVoters = issueEntity.getIssueVotes();
         issueVoters.forEach(user -> {
             if (user.getUuid().equals(userUuid)) {
                 throw new OperationNotAllowedException("You have already voted on this issue");
             }
         });
-        log.info(String.valueOf(issueDislikes.size()));
-        //if the user disliked the issue, remove him/her
-        issueDislikes.forEach(userEntity1 -> {
-            if(userEntity1.getUuid().equals(userEntity.getUuid())){
-                issueDislikes.remove(userEntity);
-                log.info(String.valueOf(issueDislikes.size()));
-                issueEntity.setIssueDislikes(issueDislikes);
-                issueRepository.save(issueEntity);
+
+        for (int a = 0; a < issueDislikes.size(); a++) {
+            if (issueDislikes.get(a).getUuid().equals(userEntity.getUuid())) {
+                issueEntity.removeIssueDownVote(issueDislikes.get(a));
             }
-        });
+        }
 
         if (issueVoters.isEmpty()) {
             issueEntity.setIssueVotes(Stream.of(userEntity).collect(Collectors.toList()));
             issueRepository.save(issueEntity);
             return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
         }
-
-        issueVoters.add(userEntity);
-        issueEntity.setIssueVotes(issueVoters);
+        issueEntity.addIssueVote(userEntity);
         return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 
@@ -234,31 +242,22 @@ public class CommunityServiceImpl implements CommunityService {
 
 
         //TODO : IMPLEMENT A LIKE AND DISLIKE
-        List<UserEntity> issueDislikes = issueEntity.getIssueDislikes();
+        List<UserEntity> issueDislikes = issueEntity.getIssueDownVotes();
         List<UserEntity> issueLikes = issueEntity.getIssueVotes();
-       // issueEntity.setIssueVotes(new ArrayList<>());
-
-        issueLikes.forEach(userEntity1->{
-            if(userEntity1.getUuid().equals(user.getUuid())){
-                issueDislikes.remove(user);
-                issueEntity.setIssueVotes(issueDislikes);
-                issueRepository.save(issueEntity);
-            }
-        });
-
-        if (issueDislikes.isEmpty()) {
-            issueEntity.setIssueDislikes(Stream.of(user).collect(Collectors.toList()));
-            issueRepository.save(issueEntity);
-            return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
-        }
         issueDislikes.forEach(userEntity -> {
             if (userEntity.getUuid().equals(userUuid)) {
-                throw new OperationNotAllowedException("You have already voted on this issue");
+                throw new OperationNotAllowedException("You have already down voted on this issue");
             }
         });
-        issueDislikes.remove(user);
-        issueEntity.setIssueDislikes(issueDislikes);
+        if (issueLikes.size() != 0) {
+            for (int a = 0; a < issueLikes.size(); a++) {
+                if (issueLikes.get(a).getUuid().equals(user.getUuid())) {
+                    issueEntity.removeIssueVote(issueLikes.get(a));
+                }
+            }
 
+        }
+        issueEntity.addIssueDownVote(user);
         return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 

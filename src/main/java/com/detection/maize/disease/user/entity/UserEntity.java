@@ -14,6 +14,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -61,6 +62,12 @@ public class UserEntity extends BaseEntity {
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id"))
     List<Role> roles;
+
+    @ManyToMany(mappedBy = "issueVotes")
+    private List<IssueEntity> issueUpVotes = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "issueDownVotes")
+    private List<IssueEntity> issueDownVotes = new ArrayList<>();
 
 
 }

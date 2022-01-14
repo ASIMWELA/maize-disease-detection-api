@@ -8,7 +8,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -42,7 +44,7 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String crop;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    LocalDate createdAt;
+    Date createdAt;
     long issueLikes = 0;
     long issueDislikes;
     long issueAnswers;
@@ -51,15 +53,20 @@ public class IssueModel extends RepresentationModel<IssueModel> {
         String createdBy = entity.getUser().getFirstName() + " " + entity.getUser().getLastName();
         int numberOfAnswers = 0;
         long issueUpVotes = 0;
+        long issueDownVotes = 0;
         if (entity.getAnswers() != null) {
             numberOfAnswers = entity.getAnswers().size();
         }
-
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
         if (entity.getIssueVotes() != null) {
             issueUpVotes = entity.getIssueVotes().size();
         }
+        if (entity.getIssueDownVotes() != null) {
+            issueDownVotes = entity.getIssueDownVotes().size();
+        }
         return IssueModel.builder()
                 .issueLikes(issueUpVotes)
+                .issueDislikes(issueDownVotes)
                 .question(entity.getQuestion())
                 .createdBy(createdBy)
                 .crop(entity.getCrop())

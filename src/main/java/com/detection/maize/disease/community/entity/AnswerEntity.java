@@ -11,6 +11,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Table(name="answers_table")
@@ -31,10 +32,10 @@ public class AnswerEntity extends BaseEntity {
     long answerDislikes;
 
     @Column(name="created_at", length = 200, nullable = false)
-    LocalDate createdAt;
+    Date createdAt;
 
     @Column(name="modified_at", length = 200, nullable = false)
-    LocalDate modifiedAt;
+    Date modifiedAt;
 
     @ManyToOne
     @JoinColumn(name = "issue_id", nullable = false, updatable = false)

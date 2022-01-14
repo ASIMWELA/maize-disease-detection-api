@@ -13,6 +13,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -24,26 +25,26 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IssueEntity extends BaseEntity {
-    @Column(name="issue_name", length = 200, nullable = false, unique = true)
+    @Column(name="issue_name", length = 200, nullable = false)
     String question;
 
-    @Column(name="issue_description", length = 2000, nullable = false, unique = true)
+    @Column(name="issue_description", length = 2000, nullable = false)
     String questionDescription;
 
     @Column(name="crop", length = 300)
     String crop;
 
     @Column(name="created_at", nullable = false)
-    LocalDate createdAt;
+    Date createdAt;
 
     @Column(name="modified_at", nullable = false)
-    LocalDate modifiedAt;
+    Date modifiedAt;
 
     @Lob
     @Column(name="issue_image")
     private byte[] issueImage;
 
-    @Column(name = "image_name", unique = true)
+    @Column(name = "image_name")
     private String imageName;
 
     @Column(name="image_type")
@@ -77,5 +78,23 @@ public class IssueEntity extends BaseEntity {
             name="user_issue_dislikes_table",
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="issue_id"))
-    List<UserEntity> issueDislikes = new ArrayList<>();
+    List<UserEntity> issueDownVotes = new ArrayList<>();
+
+    public void addIssueVote(UserEntity user) {
+        issueVotes.add(user);
+        user.getIssueUpVotes().add(this);
+    }
+    public void removeIssueVote(UserEntity user) {
+        issueVotes.remove(user);
+        user.getIssueUpVotes().remove(this);
+    }
+
+    public void addIssueDownVote(UserEntity user) {
+        issueDownVotes.add(user);
+        user.getIssueDownVotes().add(this);
+    }
+    public void removeIssueDownVote(UserEntity user) {
+        issueDownVotes.remove(user);
+        user.getIssueDownVotes().remove(this);
+    }
 }
