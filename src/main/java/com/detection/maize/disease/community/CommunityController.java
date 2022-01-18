@@ -75,14 +75,23 @@ public class CommunityController {
 
     @PutMapping("/issues/up-vote/{issueUuid}/{userUuid}")
     @Transactional
-    public ResponseEntity<IssueModel> upVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid){
+    public ResponseEntity<IssueModel> upVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid) {
         return communityService.upVoteAnIssue(issueUuid, userUuid);
     }
 
     @PutMapping("/issues/down-vote/{issueUuid}/{userUuid}")
     @Transactional
-    public ResponseEntity<IssueModel> downVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid){
+    public ResponseEntity<IssueModel> downVoteIssue(@PathVariable("issueUuid") String issueUuid, @PathVariable("userUuid") String userUuid) {
         return communityService.downVoteAnIssue(issueUuid, userUuid);
+    }
+
+    @PutMapping("/issues/answers/like-answer/{userUuid}/{issueUuid}/{answerUuid}")
+    @Transactional
+    public ResponseEntity<PagedModel<?>> likeAnswer(@PathVariable("issueUuid") String issueUuid,
+                                                    @PathVariable("answerUuid") String answerUuid,
+                                                    @PathVariable("userUuid") String userUuid,
+                                                    PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        return communityService.likeIssueAnswer(issueUuid, answerUuid, userUuid, pagedResourcesAssembler);
     }
 
 }

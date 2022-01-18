@@ -69,5 +69,11 @@ public class UserEntity extends BaseEntity {
     @ManyToMany(mappedBy = "issueDownVotes")
     private List<IssueEntity> issueDownVotes = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "answerLikes")
+    private List<AnswerEntity> answerLikes = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "answerDislikes")
+    private List<AnswerEntity> answerDislikes = new ArrayList<>();
+
 
 }

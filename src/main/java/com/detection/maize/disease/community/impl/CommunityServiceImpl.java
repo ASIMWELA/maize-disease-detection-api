@@ -181,7 +181,7 @@ public class CommunityServiceImpl implements CommunityService {
         IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
                 () -> new EntityNotFoundException("No issue with  the provided id")
         );
-        Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size,Sort.by("id").descending()));
+        Page<AnswerEntity> answers = answerRepository.findByIssue(issue, PageRequest.of(page, size, Sort.by("id").descending()));
         if (answers.hasContent()) {
             PagedModel<AnswerModel> answerModels = pagedResourcesAssembler.toModel(answers, answerModelAssembler);
             answerModels.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
@@ -259,6 +259,52 @@ public class CommunityServiceImpl implements CommunityService {
         }
         issueEntity.addIssueDownVote(user);
         return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
+    }
+
+    @Override
+    public ResponseEntity<PagedModel<?>> likeIssueAnswer(String issueUuid, String answerUuid,
+                                                         String userUuid,
+                                                         PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        AnswerEntity answer = answerRepository.findByUuid(answerUuid).orElseThrow(
+                () -> new EntityNotFoundException("Answer not found with the given identifier")
+        );
+
+        UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
+                () -> new EntityNotFoundException("No user with the given identifier")
+        );
+        IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
+                () -> new EntityNotFoundException("No issue found with the given identifier")
+        );
+        if (answer.getUser().getUuid().equals(user.getUuid())) {
+            throw new OperationNotAllowedException("You cannot like your own answer");
+        }
+        List<UserEntity> answerLikes = answer.getAnswerLikes();
+        List<UserEntity> answerDislikes = answer.getAnswerDislikes();
+
+        answerLikes.forEach(user1 -> {
+            if (user1.getUuid().equals(user.getUuid())) {
+                throw new OperationNotAllowedException("You have already liked this answer");
+            }
+        });
+
+        for (int a = 0; a < answerDislikes.size(); a++) {
+            if (answerDislikes.get(a).getUuid().equals(user.getUuid())) {
+                answer.removeAnswerDislike(answerDislikes.get(a));
+            }
+        }
+        answer.addAnswerLike(user);
+
+        answerRepository.save(answer);
+
+        return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
+    }
+
+    @Override
+    public ResponseEntity<PagedModel<?>> dislikeIssueAnswer(String issueUuid,
+                                                            String answerUuid,
+                                                            String userUuid,
+                                                            PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        return null;
     }
 
 }

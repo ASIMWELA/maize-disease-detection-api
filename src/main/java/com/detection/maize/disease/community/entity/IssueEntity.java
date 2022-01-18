@@ -60,13 +60,13 @@ public class IssueEntity extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnore
-    List<AnswerEntity> answers;
+    List<AnswerEntity> answers = new ArrayList<>();
 
     @ManyToMany
     @LazyCollection(LazyCollectionOption.TRUE)
     @JsonIgnore
     @JoinTable(
-            name="user_issue_votes_table",
+            name="user_issue_likes_table",
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="issue_id"))
     List<UserEntity> issueVotes = new ArrayList<>();
@@ -80,6 +80,7 @@ public class IssueEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name="issue_id"))
     List<UserEntity> issueDownVotes = new ArrayList<>();
 
+    //helper functions for updating votes on issues
     public void addIssueVote(UserEntity user) {
         issueVotes.add(user);
         user.getIssueUpVotes().add(this);
