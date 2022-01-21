@@ -122,6 +122,7 @@ public class CommunityServiceImpl implements CommunityService {
                     .user(userEntity)
                     .build();
         }
+        log.info("Saved issue " + issueEntity.getUuid());
         return new ResponseEntity<>(IssueModel.build(issueRepository.save(issueEntity)), HttpStatus.CREATED);
     }
 
@@ -150,6 +151,7 @@ public class CommunityServiceImpl implements CommunityService {
             return ResponseEntity.ok(pagedResourcesAssembler
                     .toModel(issues, issueModelAssembler));
         }
+        log.info("Returned paged issues");
         return ResponseEntity.ok(pagedResourcesAssembler.toEmptyModel(issues, IssueModel.class));
     }
 
@@ -173,6 +175,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .issue(issue)
                 .build();
         answerRepository.save(answer);
+        log.info("User " + user.getEmail() + "Answer issue " + issue.getUuid());
         return this.getIssueAnswers(issue.getUuid(), page, size, pagedResourcesAssembler);
     }
 
@@ -189,6 +192,7 @@ public class CommunityServiceImpl implements CommunityService {
         }
         PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class);
         objects.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
+       log.info("Returned issue answers");
         return ResponseEntity.ok(objects);
     }
 
@@ -224,6 +228,7 @@ public class CommunityServiceImpl implements CommunityService {
             return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
         }
         issueEntity.addIssueVote(userEntity);
+        log.info("Issue " + issueEntity.getUuid() + " got 1 vote");
         return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 
@@ -240,8 +245,6 @@ public class CommunityServiceImpl implements CommunityService {
             throw new OperationNotAllowedException("You cannot dislike your own issue");
         }
 
-
-        //TODO : IMPLEMENT A LIKE AND DISLIKE
         List<UserEntity> issueDislikes = issueEntity.getIssueDownVotes();
         List<UserEntity> issueLikes = issueEntity.getIssueVotes();
         issueDislikes.forEach(userEntity -> {
@@ -258,6 +261,7 @@ public class CommunityServiceImpl implements CommunityService {
 
         }
         issueEntity.addIssueDownVote(user);
+        log.info("Issue " + issueEntity.getUuid() + " got 1 down vote");
         return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 
@@ -295,7 +299,7 @@ public class CommunityServiceImpl implements CommunityService {
         answer.addAnswerLike(user);
 
         answerRepository.save(answer);
-
+        log.info("Answer "+ answer.getUuid() + " got 1 like");
         return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
     }
 
@@ -332,7 +336,7 @@ public class CommunityServiceImpl implements CommunityService {
         answer.addAnswerDislike(user);
 
         answerRepository.save(answer);
-
+        log.info("Answer "+ answer.getUuid() + " got disliked");
         return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
     }
 

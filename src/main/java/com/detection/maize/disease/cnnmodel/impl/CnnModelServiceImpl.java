@@ -1,8 +1,15 @@
 package com.detection.maize.disease.cnnmodel.impl;
 
 import com.detection.maize.disease.cnnmodel.CnnModelService;
+import com.detection.maize.disease.disease.entity.DiseaseEntity;
+import com.detection.maize.disease.disease.entity.PrescriptionEntity;
+import com.detection.maize.disease.disease.entity.SymptomEntity;
 import com.detection.maize.disease.disease.payload.GetDiseaseResponse;
+import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
+import com.detection.maize.disease.exception.EntityNotFoundException;
+import lombok.AccessLevel;
 import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -16,11 +23,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CnnModelServiceImpl implements CnnModelService {
+
+    DiseaseRepository diseaseRepository;
+
+    public CnnModelServiceImpl(DiseaseRepository diseaseRepository) {
+        this.diseaseRepository = diseaseRepository;
+    }
+
 
     @Override
     @SneakyThrows
@@ -45,23 +61,33 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         INDArray inputImage = loader.asMatrix(image.getInputStream());
 
-<<<<<<< HEAD
-=======
-        log.info(Arrays.toString(inputImage.shape()));
-        
->>>>>>> 112e62a3129038ea41dbfcad329efb2e92993f90
         DataNormalization scalar = new ImagePreProcessingScaler(0, 1);
         scalar.transform(inputImage);
 
-        //Key: [gray_leaf_spot, common_rust, nothern_leaf_blight, heathy]
-        INDArray output = model.output(inputImage.reshape(new int[]{1,3,215, 215}));
+        String[] diseaseTrainedOrder = {"Gray leaf spot", "Common rust", "Northern leaf blight", "Health"};
 
-        double[] doubles = Arrays.stream(output.toDoubleVector()).toArray();
-//        Arrays.stream(doubles).max().ifPresent(d->reg);
-//
-//        int index_maxNumber = numberList.indexOf(Collections.max(numberList))
-        log.info("Evaluate model....");
-        log.info(output.toString());
-        return null;
+        INDArray output = model.output(inputImage.reshape(new int[]{1, 3, 215, 215}));
+
+        double[] outputProbabilities = Arrays.stream(output.toDoubleVector()).toArray();
+        log.info("Probabilities : " + Arrays.toString(outputProbabilities));
+        log.info("Key : " + "{Gray leaf spot, Common rust, Northern leaf blight, Health}");
+        int indexOfLarge = 0;
+        for (int i = 1; i < outputProbabilities.length; i++) {
+            if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
+        }
+        String diseaseName = diseaseTrainedOrder[indexOfLarge];
+        DiseaseEntity diseaseEntity = diseaseRepository.findByDiseaseName(diseaseName).orElseThrow(
+                () -> new EntityNotFoundException("Oops! seems like our model doesnt recognise the disease\n consider creating an issue in the community")
+        );
+        List<String> symptoms = diseaseEntity.getSymptoms().stream().map(SymptomEntity::getSymptomDescription).collect(Collectors.toList());
+
+        List<String> prescriptions = diseaseEntity.getPrescriptions().stream().map(PrescriptionEntity::getDiseasePrescription).collect(Collectors.toList());
+
+        return ResponseEntity.ok(GetDiseaseResponse.builder()
+                .diseaseName(diseaseEntity.getDiseaseName())
+                .diseaseUuid(diseaseEntity.getUuid())
+                .prescriptions(prescriptions)
+                .symptoms(symptoms)
+                .build());
     }
 }

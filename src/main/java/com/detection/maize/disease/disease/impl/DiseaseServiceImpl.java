@@ -20,6 +20,7 @@ import com.detection.maize.disease.exception.OperationNotAllowedException;
 import com.detection.maize.disease.util.UuidGenerator;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -40,6 +41,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class DiseaseServiceImpl implements DiseaseService {
     DiseaseRepository diseaseRepository;
     SymptomRepository symptomRepository;
@@ -69,6 +71,7 @@ public class DiseaseServiceImpl implements DiseaseService {
         }
         disease.setUuid(UuidGenerator.generateRandomString(12));
         diseaseRepository.save(disease);
+        log.info("Saved disease " + disease.getDiseaseName());
         return new ResponseEntity<>(ApiResponse.builder().success(true).message("disease saved").build(), HttpStatus.CREATED);
     }
 
@@ -103,6 +106,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                         .disease(disease)
                         .build();
                 symptomRepository.save(symptomEntity);
+                log.info("Saved symptom " + symptomEntity.getUuid());
             }
         }
         return ResponseEntity.ok(ApiResponse.builder().success(true).message("Symptoms added").build());
@@ -130,6 +134,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                         .disease(disease)
                         .build();
                 prescriptionRepository.save(prescriptionEntity);
+                log.info("Saved prescription " + prescription.getUuid());
             } else {
                 for (PrescriptionEntity presc : diseasePresc) {
                     //check is the prescription is already added
@@ -143,6 +148,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                         .disease(disease)
                         .build();
                 prescriptionRepository.save(prescriptionEntity2);
+                log.info("Added prescription " + prescriptionEntity2.getUuid());
             }
         }
         return ResponseEntity.ok(ApiResponse.builder().success(true).message("Prescriptions added").build());
@@ -155,6 +161,7 @@ public class DiseaseServiceImpl implements DiseaseService {
             return ResponseEntity.ok(pagedResourcesAssembler
                     .toModel(diseases, diseaseModelAssembler));
         }
+        log.info("Returned paged diseases");
         return ResponseEntity.ok(pagedResourcesAssembler.toEmptyModel(diseases, DiseaseModel.class));
     }
 
@@ -173,6 +180,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                         .symptoms(symptoms)
                         .build();
         getDiseaseResponse.add(linkTo(methodOn(DiseaseController.class).getDiseases(Constants.PAGE, Constants.SIZE, null)).withRel("diseases"));
+       log.info("Returned disease " + disease.getDiseaseName());
         return ResponseEntity.ok(getDiseaseResponse);
     }
 
@@ -189,6 +197,7 @@ public class DiseaseServiceImpl implements DiseaseService {
             CollectionModel<Object> symptomsModel = new CollectionModel<>(Collections.singletonList(wrapper));
             symptomsModel.add(linkTo(methodOn(DiseaseController.class).getDiseases(Constants.PAGE, Constants.SIZE, null)).withRel("diseases"));            return ResponseEntity.ok(symptomsModel);
         }
+        log.info("Returned symptoms for disease " + disease.getDiseaseName());
         return ResponseEntity.ok(symptomModelAssembler.toCollectionModel(symptoms).add(linkTo(methodOn(DiseaseController.class).getDiseases(Constants.PAGE, Constants.SIZE, null)).withRel("diseases")));
     }
 
@@ -206,6 +215,7 @@ public class DiseaseServiceImpl implements DiseaseService {
             CollectionModel<Object> prescriptionsModel = new CollectionModel<>(Collections.singletonList(wrapper));
             return ResponseEntity.ok(prescriptionsModel.add(linkTo(methodOn(DiseaseController.class).getDiseases(Constants.PAGE, Constants.SIZE, null)).withRel("diseases")));
         }
+        log.info("Returned prescriptions for disease " + disease.getDiseaseName());
         return ResponseEntity.ok(prescriptionsModelAssembler.toCollectionModel(prescriptions).add(linkTo(methodOn(DiseaseController.class).getDiseases(Constants.PAGE, Constants.SIZE, null)).withRel("diseases")));
     }
 }
