@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Service
 @Slf4j
@@ -44,13 +45,16 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         INDArray inputImage = loader.asMatrix(image.getInputStream());
 
-        log.info(Arrays.toString(inputImage.shape()));
-
         DataNormalization scalar = new ImagePreProcessingScaler(0, 1);
         scalar.transform(inputImage);
 
         //Key: [gray_leaf_spot, common_rust, nothern_leaf_blight, heathy]
         INDArray output = model.output(inputImage.reshape(new int[]{1,3,215, 215}));
+
+        double[] doubles = Arrays.stream(output.toDoubleVector()).toArray();
+//        Arrays.stream(doubles).max().ifPresent(d->reg);
+//
+//        int index_maxNumber = numberList.indexOf(Collections.max(numberList))
         log.info("Evaluate model....");
         log.info(output.toString());
         return null;
