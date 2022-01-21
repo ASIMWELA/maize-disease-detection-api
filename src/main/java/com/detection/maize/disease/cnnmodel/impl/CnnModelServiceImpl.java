@@ -45,7 +45,7 @@ public class CnnModelServiceImpl implements CnnModelService {
         INDArray inputImage = loader.asMatrix(image.getInputStream());
 
         log.info(Arrays.toString(inputImage.shape()));
-
+        
         DataNormalization scalar = new ImagePreProcessingScaler(0, 1);
         scalar.transform(inputImage);
 
