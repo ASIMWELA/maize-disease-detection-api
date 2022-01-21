@@ -41,9 +41,19 @@ public class AnswerModel extends RepresentationModel<AnswerModel> {
     Date createdAt;
 
     public static AnswerModel buildAnswerModel(AnswerEntity answerEntity) {
+        long totalAnswerLike = 0;
+        long totalAnswerDisLike = 0;
+        if(answerEntity.getAnswerLikes() != null){
+            totalAnswerLike = answerEntity.getAnswerLikes().size();
+        }
+        if(answerEntity.getAnswerDislikes() != null){
+            totalAnswerDisLike = answerEntity.getAnswerDislikes().size();
+        }
         return AnswerModel.builder()
                 .answerContent(answerEntity.getAnswerContent())
                 .createdAt(answerEntity.getCreatedAt())
+                .answerLikes(totalAnswerLike)
+                .answerDislikes(totalAnswerDisLike)
                 .answerBy(answerEntity.getUser().getFirstName() + " " + answerEntity.getUser().getLastName())
                 .uuid(answerEntity.getUuid())
                 .build();

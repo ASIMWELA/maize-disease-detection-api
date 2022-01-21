@@ -85,13 +85,22 @@ public class CommunityController {
         return communityService.downVoteAnIssue(issueUuid, userUuid);
     }
 
-    @PutMapping("/issues/answers/like-answer/{userUuid}/{issueUuid}/{answerUuid}")
+    @PutMapping("/issues/answers/like-answer/{issueUuid}/{answerUuid}/{userUuid}")
     @Transactional
     public ResponseEntity<PagedModel<?>> likeAnswer(@PathVariable("issueUuid") String issueUuid,
                                                     @PathVariable("answerUuid") String answerUuid,
                                                     @PathVariable("userUuid") String userUuid,
                                                     PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
         return communityService.likeIssueAnswer(issueUuid, answerUuid, userUuid, pagedResourcesAssembler);
+    }
+
+    @PutMapping("/issues/answers/dislike-answer/{issueUuid}/{answerUuid}/{userUuid}")
+    @Transactional
+    public ResponseEntity<PagedModel<?>> disLikeAnswer(@PathVariable("issueUuid") String issueUuid,
+                                                    @PathVariable("answerUuid") String answerUuid,
+                                                    @PathVariable("userUuid") String userUuid,
+                                                    PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        return communityService.dislikeIssueAnswer(issueUuid, answerUuid, userUuid, pagedResourcesAssembler);
     }
 
 }

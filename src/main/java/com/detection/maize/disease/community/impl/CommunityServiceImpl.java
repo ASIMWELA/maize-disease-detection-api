@@ -302,9 +302,38 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public ResponseEntity<PagedModel<?>> dislikeIssueAnswer(String issueUuid,
                                                             String answerUuid,
-                                                            String userUuid,
-                                                            PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
-        return null;
+                                                            String userUuid, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+        AnswerEntity answer = answerRepository.findByUuid(answerUuid).orElseThrow(
+                () -> new EntityNotFoundException("Answer not found with the given identifier")
+        );
+
+        UserEntity user = userRepository.findByUuid(userUuid).orElseThrow(
+                () -> new EntityNotFoundException("No user with the given identifier")
+        );
+        IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
+                () -> new EntityNotFoundException("No issue found with the given identifier")
+        );
+        if (answer.getUser().getUuid().equals(user.getUuid())) {
+            throw new OperationNotAllowedException("You cannot dislike your own answer");
+        }
+        List<UserEntity> answerLikes = answer.getAnswerLikes();
+        List<UserEntity> answerDislikes = answer.getAnswerDislikes();
+
+        answerDislikes.forEach(user1 -> {
+            if (user1.getUuid().equals(user.getUuid())) {
+                throw new OperationNotAllowedException("You have already disliked this answer");
+            }
+        });
+        for (int a = 0; a < answerLikes.size(); a++) {
+            if (answerLikes.get(a).getUuid().equals(user.getUuid())) {
+                answer.removeAnswerLike(answerLikes.get(a));
+            }
+        }
+        answer.addAnswerDislike(user);
+
+        answerRepository.save(answer);
+
+        return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
     }
 
 }
