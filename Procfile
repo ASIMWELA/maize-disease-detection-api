@@ -1,0 +1,1 @@
+web: java -jar target/Maize-Disease-Detection-api.jar

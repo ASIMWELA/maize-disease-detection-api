@@ -140,6 +140,7 @@
     </dependencies>
 
     <build>
+        <finalName>Maize-Disease-Detection-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
