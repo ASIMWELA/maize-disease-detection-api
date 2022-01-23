@@ -1,0 +1,31 @@
+version: "3"
+services:
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: maizedisease
+      POSTGRES_USER: auga
+      POSTGRES_PASSWORD: auga.
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5477:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: auga@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: auga
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - "db:pgsql-server"
+volumes:
+  db-data:
+  pgadmin-data:
