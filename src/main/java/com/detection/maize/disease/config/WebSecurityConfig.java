@@ -82,29 +82,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,
                         "/api/v1/users", "/api/v1/auth/login",
-                        "/api/v1/community/**"
+                        "/api/v1/model/detect"
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.GET,
-                        "/api/v1/providers",
-                        "/api/v1/services/categories",
-                        "/api/v1/services",
-                        "/api/v1/services/{serviceUuid}/providers"
+                        "/api/v1/community/issues",
+                        "/api/v1/community/answers/{issueUuid}",
+                        "/api/v1/community/issues/{issueUuid}",
+                        "/api/v1/diseases",
+                        "/api/v1/diseases/{diseaseUuid}",
+                        "/api/v1/diseases/get-prescriptions/{diseaseUuid}",
+                        "/api/v1/diseases/get-symptoms/{diseaseUuid}"
                 )
                 .permitAll()
-                .antMatchers("/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
-                .permitAll()
                 .anyRequest()
-                //TODO: ALLOWS ALL THE REQUEST, CHANGE TO AUTHENTICATED
-                .permitAll();
+                .authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

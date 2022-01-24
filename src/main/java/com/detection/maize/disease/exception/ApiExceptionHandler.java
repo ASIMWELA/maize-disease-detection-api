@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ValidationException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityAlreadyExistException.class)
     protected ResponseEntity<Object> handleEntityAlreadyExistException(EntityAlreadyExistException ex) {
+        ApiException apiError = new ApiException(CONFLICT);
+        apiError.setMessage(ex.getMessage());
+        apiError.setCode(apiError.getStatus().value());
+        return buildResponseEntity(apiError);
+    }
+    @ExceptionHandler(IOException.class)
+    protected ResponseEntity<Object> handelIoException(IOException ex) {
         ApiException apiError = new ApiException(CONFLICT);
         apiError.setMessage(ex.getMessage());
         apiError.setCode(apiError.getStatus().value());

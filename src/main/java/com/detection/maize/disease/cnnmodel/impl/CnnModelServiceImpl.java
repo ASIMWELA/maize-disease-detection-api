@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +56,9 @@ public class CnnModelServiceImpl implements CnnModelService {
         int width = 215;
         int channels = 3;
 
+        if(image.isEmpty()){
+            throw new IOException("Image cannot be null");
+        }
         MultiLayerNetwork model = this.loadModel();
 
         NativeImageLoader loader = new NativeImageLoader(height, width, channels);
