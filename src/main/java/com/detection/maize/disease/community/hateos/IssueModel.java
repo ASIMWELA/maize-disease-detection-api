@@ -27,6 +27,7 @@ import static lombok.AccessLevel.PRIVATE;
                 "createdBy",
                 "createdAt",
                 "issueLikes",
+                "issueStatus",
                 "issueDislikes",
                 "issueAnswers",
                 "issueDescription"}
@@ -43,6 +44,8 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     String questionDescription;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String crop;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String issueStatus;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Date createdAt;
     long issueLikes = 0;
@@ -69,6 +72,7 @@ public class IssueModel extends RepresentationModel<IssueModel> {
                 .issueDislikes(issueDownVotes)
                 .question(entity.getQuestion())
                 .createdBy(createdBy)
+                .issueStatus(entity.getIssueStatus().name())
                 .crop(entity.getCrop())
                 .issueAnswers(numberOfAnswers)
                 .questionDescription(entity.getQuestionDescription())

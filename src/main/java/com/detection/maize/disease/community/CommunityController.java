@@ -110,4 +110,11 @@ public class CommunityController {
         return communityService.dislikeIssueAnswer(issueUuid, answerUuid, userUuid, pagedResourcesAssembler);
     }
 
+    @PutMapping("/issues/resolve-issue/{issueUuid}/{userUuid}")
+    @Transactional
+    public ResponseEntity<IssueModel> resolve(@PathVariable("issueUuid") String issueUuid,
+                                                       @PathVariable("userUuid") String userUuid) {
+        return communityService.resolveAnIssue(issueUuid, userUuid);
+    }
+
 }

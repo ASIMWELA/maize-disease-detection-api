@@ -24,4 +24,6 @@ public interface CommunityService {
     ResponseEntity<IssueModel> downVoteAnIssue(String issueUuid, String userUuid);
     ResponseEntity<PagedModel<?>> likeIssueAnswer(String issueUuid,String answerUuid, String userUuid, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
     ResponseEntity<PagedModel<?>> dislikeIssueAnswer(String issueUuid, String answerUuid, String userUuid, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
+    ResponseEntity<IssueModel> resolveAnIssue(String issueUuid, String userUuid);
+
 }

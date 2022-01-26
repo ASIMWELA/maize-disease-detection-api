@@ -5,6 +5,7 @@ import com.detection.maize.disease.community.CommunityController;
 import com.detection.maize.disease.community.CommunityService;
 import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
+import com.detection.maize.disease.community.enums.EIssueStatus;
 import com.detection.maize.disease.community.hateos.AnswerModel;
 import com.detection.maize.disease.community.hateos.AnswerModelAssembler;
 import com.detection.maize.disease.community.hateos.IssueModel;
@@ -90,6 +91,7 @@ public class CommunityServiceImpl implements CommunityService {
                     .question(issueModelConv1.getQuestion())
                     .createdAt(new Date())
                     .modifiedAt(new Date())
+                    .issueStatus(EIssueStatus.OPEN)
                     .crop(issueModelConv1.getCrop())
                     .uuid(UuidGenerator.generateRandomString(12))
                     .user(userEntity)
@@ -114,6 +116,7 @@ public class CommunityServiceImpl implements CommunityService {
                     .question(issueModelConv1.getQuestion())
                     .createdAt(new Date())
                     .modifiedAt(new Date())
+                    .issueStatus(EIssueStatus.OPEN)
                     .issueImage(file.getBytes())
                     .crop(issueModelConv1.getCrop())
                     .imageName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())))
@@ -375,6 +378,23 @@ public class CommunityServiceImpl implements CommunityService {
         answerRepository.save(answer);
         log.info("Answer " + answer.getUuid() + " got disliked");
         return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
+    }
+
+    @Override
+    public ResponseEntity<IssueModel> resolveAnIssue(String issueUuid, String userUuid) {
+
+        IssueEntity issueEntity = issueRepository.findByUuid(issueUuid).orElseThrow(
+                ()-> new EntityNotFoundException("No issue found with the given id")
+        );
+
+        UserEntity userEntity = userRepository.findByUuid(userUuid).orElseThrow(
+                ()-> new EntityNotFoundException("No user with the given id")
+        );
+        if(!issueEntity.getUser().getUuid().equals(userEntity.getUuid())){
+            throw new OperationNotAllowedException("You cannot mark an issue as resolved that you didnt create");
+        }
+        issueEntity.setIssueStatus(EIssueStatus.RESOLVED);
+        return ResponseEntity.ok(issueModelAssembler.toModel(issueRepository.save(issueEntity)));
     }
 
 }

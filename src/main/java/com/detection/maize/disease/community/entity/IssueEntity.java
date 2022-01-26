@@ -1,6 +1,7 @@
 package com.detection.maize.disease.community.entity;
 
 import com.detection.maize.disease.commons.BaseEntity;
+import com.detection.maize.disease.community.enums.EIssueStatus;
 import com.detection.maize.disease.user.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -33,6 +35,10 @@ public class IssueEntity extends BaseEntity {
 
     @Column(name="crop", length = 300)
     String crop;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    EIssueStatus issueStatus;
 
     @Column(name="created_at", nullable = false)
     Date createdAt;
