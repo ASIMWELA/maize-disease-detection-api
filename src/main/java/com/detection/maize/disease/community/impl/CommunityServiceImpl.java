@@ -97,14 +97,14 @@ public class CommunityServiceImpl implements CommunityService {
         } else {
 
             //check it 8is really an image
-            String regex
-                    = "([^\\s]+(\\.(?i)(jpg|png|bmp|gif))$)";
-            Pattern p = Pattern.compile(regex);
-            log.info(file.getContentType());
-            Matcher m = p.matcher(Objects.requireNonNull(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()))));
-            if (!m.matches()) {
-                throw new OperationNotAllowedException("The file is not an image, allowed image extensions[jpeg|png|gif|bmp]");
-            }
+//            String regex
+//                    = "([^\\s]+(\\.(?i)(jpg|png|bmp|gif|JPG|PNG|BMP|GIF|JPEG|jpeg))$)";
+//            Pattern p = Pattern.compile(regex);
+//            log.info(file.getContentType());
+//            Matcher m = p.matcher(Objects.requireNonNull(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()))));
+//            if (!m.matches()) {
+//                throw new OperationNotAllowedException("The file is not an image, allowed image extensions[jpeg|png|gif|bmp]");
+//            }
             if (ImageIO.read(file.getInputStream()) == null) {
                 throw new OperationNotAllowedException("The file is not an image");
             }
@@ -144,6 +144,22 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    public ResponseEntity<byte[]> renderAnswerImage(String answeruuid) {
+        AnswerEntity answerEntity = answerRepository.findByUuid(answeruuid).orElseThrow(
+                () -> new RuntimeException("No image with the provided uuid")
+        );
+
+        MediaType contentType = MediaType.parseMediaType(answerEntity.getAnswerImageType());
+
+        return ResponseEntity.ok()
+                .contentType(contentType)
+                //for download
+                //.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename="+ resource.getFilename())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + answerEntity.getAnswerImageName())
+                .body(answerEntity.getAnswerImage());
+    }
+
+    @Override
     public ResponseEntity<PagedModel<?>> getPagedIssueModels(int page, int size, PagedResourcesAssembler<IssueEntity> pagedResourcesAssembler) {
         Page<IssueEntity> issues = issueRepository.findAll(PageRequest.of(page, size, Sort.by("id").descending()));
 
@@ -156,7 +172,8 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public ResponseEntity<PagedModel<?>> answerIssue(String issueUuid, String userUuid, AnswerRequest answerRequest, int page, int size, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
+    @SneakyThrows
+    public ResponseEntity<PagedModel<?>> answerIssue(String issueUuid, String userUuid, MultipartFile image, String answerConv, int page, int size, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
         IssueEntity issue = issueRepository.findByUuid(issueUuid).orElseThrow(
                 () -> new EntityNotFoundException("No issue with the given id")
         );
@@ -166,15 +183,34 @@ public class CommunityServiceImpl implements CommunityService {
         if (issue.getUser().getEmail().equals(user.getEmail())) {
             throw new OperationNotAllowedException("You cannot answer to your own created issue");
         }
-        AnswerEntity answer = AnswerEntity.builder()
-                .answerContent(answerRequest.getAnswer())
-                .createdAt(new Date())
-                .modifiedAt(new Date())
-                .uuid(UuidGenerator.generateRandomString(12))
-                .user(user)
-                .issue(issue)
-                .build();
-        answerRepository.save(answer);
+
+        AnswerEntity answerEntity = null;
+        ObjectMapper mapper = new ObjectMapper();
+        AnswerRequest answerRequest = mapper.readValue(answerConv, AnswerRequest.class);
+
+        if (image == null) {
+            answerEntity = AnswerEntity.builder()
+                    .answerContent(answerRequest.getAnswer())
+                    .createdAt(new Date())
+                    .modifiedAt(new Date())
+                    .uuid(UuidGenerator.generateRandomString(12))
+                    .user(user)
+                    .issue(issue)
+                    .build();
+        } else {
+            answerEntity = AnswerEntity.builder()
+                    .answerContent(answerRequest.getAnswer())
+                    .createdAt(new Date())
+                    .modifiedAt(new Date())
+                    .answerImage(image.getBytes())
+                    .answerImageType(image.getContentType())
+                    .answerImageName(StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename())))
+                    .uuid(UuidGenerator.generateRandomString(12))
+                    .user(user)
+                    .issue(issue)
+                    .build();
+        }
+        answerRepository.save(answerEntity);
         log.info("User " + user.getEmail() + "Answer issue " + issue.getUuid());
         return this.getIssueAnswers(issue.getUuid(), page, size, pagedResourcesAssembler);
     }
@@ -188,11 +224,12 @@ public class CommunityServiceImpl implements CommunityService {
         if (answers.hasContent()) {
             PagedModel<AnswerModel> answerModels = pagedResourcesAssembler.toModel(answers, answerModelAssembler);
             answerModels.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
+            log.info("Returned issue answers");
             return ResponseEntity.ok(answerModels);
         }
         PagedModel<?> objects = pagedResourcesAssembler.toEmptyModel(answers, AnswerModel.class);
         objects.add(linkTo(methodOn(CommunityController.class).getIssues(Constants.PAGE, Constants.SIZE, null)).withRel("issues"));
-       log.info("Returned issue answers");
+        log.info("Returned issue answers");
         return ResponseEntity.ok(objects);
     }
 
@@ -299,7 +336,7 @@ public class CommunityServiceImpl implements CommunityService {
         answer.addAnswerLike(user);
 
         answerRepository.save(answer);
-        log.info("Answer "+ answer.getUuid() + " got 1 like");
+        log.info("Answer " + answer.getUuid() + " got 1 like");
         return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
     }
 
@@ -336,7 +373,7 @@ public class CommunityServiceImpl implements CommunityService {
         answer.addAnswerDislike(user);
 
         answerRepository.save(answer);
-        log.info("Answer "+ answer.getUuid() + " got disliked");
+        log.info("Answer " + answer.getUuid() + " got disliked");
         return this.getIssueAnswers(issue.getUuid(), Constants.PAGE, Constants.SIZE, pagedResourcesAssembler);
     }
 

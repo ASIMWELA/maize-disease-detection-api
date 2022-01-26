@@ -86,6 +86,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.GET,
+                        "/api/v1/community/issue-image/{issueUuid}",
+                        "/api/v1/community/answers/answer-image/{answerUuid}",
                         "/api/v1/community/issues",
                         "/api/v1/community/answers/{issueUuid}",
                         "/api/v1/community/issues/{issueUuid}",

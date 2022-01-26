@@ -27,6 +27,16 @@ public class AnswerEntity extends BaseEntity {
     @Column(name="answer_content", length = 800, nullable = false)
     String answerContent;
 
+    @Lob
+    @Column(name="answer_image")
+    private byte[] answerImage;
+
+    @Column(name = "answer_image_name")
+    private String answerImageName;
+
+    @Column(name="answer_image_type")
+    private String answerImageType;
+
     @Column(name="created_at", length = 200, nullable = false)
     Date createdAt;
 
@@ -39,7 +49,7 @@ public class AnswerEntity extends BaseEntity {
     @JsonIgnore
     IssueEntity issue;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore

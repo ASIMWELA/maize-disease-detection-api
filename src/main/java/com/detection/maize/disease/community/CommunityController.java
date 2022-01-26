@@ -36,9 +36,15 @@ public class CommunityController {
     }
 
     @Transactional
-    @GetMapping("/{issueUuid}")
+    @GetMapping("/issue-image/{issueUuid}")
     public ResponseEntity<byte[]> getIssueImageUrl(@PathVariable String issueUuid) {
         return communityService.downloadImage(issueUuid);
+    }
+
+    @Transactional
+    @GetMapping("/answers/answer-image/{answerUuid}")
+    public ResponseEntity<byte[]> getAnswerImage(@PathVariable("answerUuid") String answerUuid) {
+        return communityService.renderAnswerImage(answerUuid);
     }
 
     @Transactional
@@ -66,11 +72,12 @@ public class CommunityController {
     public ResponseEntity<PagedModel<?>> answerAnIssue(
             @PathVariable("issueUuid") String issueUuid,
             @PathVariable("userUuid") String userUuid,
-            @Valid @RequestBody AnswerRequest answerRequest,
+            @RequestParam(value = "image", required = false) MultipartFile file,
+            @RequestParam("answer") String answerConv,
             @PositiveOrZero @RequestParam(value = "page", defaultValue = "0") int page,
             @Positive @RequestParam(value = "size", defaultValue = "20") int size,
             PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler) {
-        return communityService.answerIssue(issueUuid, userUuid, answerRequest, page, size, pagedResourcesAssembler);
+        return communityService.answerIssue(issueUuid, userUuid, file,answerConv, page, size, pagedResourcesAssembler);
     }
 
     @PutMapping("/issues/up-vote/{issueUuid}/{userUuid}")

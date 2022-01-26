@@ -50,7 +50,7 @@ public class IssueEntity extends BaseEntity {
     @Column(name="image_type")
     private String imageType;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore

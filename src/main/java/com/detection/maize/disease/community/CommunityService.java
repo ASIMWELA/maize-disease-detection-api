@@ -12,9 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 public interface CommunityService {
     ResponseEntity<IssueModel> createIssue(MultipartFile file, String issueModelConv, String userUuid);
     ResponseEntity<byte[]> downloadImage(String issueUuid);
+    ResponseEntity<byte[]> renderAnswerImage(String answeruuid);
     ResponseEntity<PagedModel<?>> getPagedIssueModels(int page, int size, PagedResourcesAssembler<IssueEntity> pagedResourcesAssembler);
     ResponseEntity<PagedModel<?>> answerIssue(String issueUud, String userUuid,
-                                                        AnswerRequest answerRequest,
+                                                        MultipartFile image,
+                                                        String answerConv,
                                                         int page, int size,
                                                         PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
     ResponseEntity<PagedModel<?>> getIssueAnswers(String issueUuid, int page, int size, PagedResourcesAssembler<AnswerEntity> pagedResourcesAssembler);
