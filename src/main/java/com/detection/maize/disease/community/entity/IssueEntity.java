@@ -86,6 +86,9 @@ public class IssueEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name="issue_id"))
     List<UserEntity> issueDownVotes = new ArrayList<>();
 
+    @OneToOne(mappedBy = "answer")
+    FileSystemImage image;
+
     //helper functions for updating votes on issues
     public void addIssueVote(UserEntity user) {
         issueVotes.add(user);

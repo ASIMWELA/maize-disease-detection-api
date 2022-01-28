@@ -24,6 +24,8 @@ import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.datavec.image.format.ImageInputFormat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -39,10 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -98,15 +97,12 @@ public class CommunityServiceImpl implements CommunityService {
                     .build();
         } else {
 
-            //check it 8is really an image
-//            String regex
-//                    = "([^\\s]+(\\.(?i)(jpg|png|bmp|gif|JPG|PNG|BMP|GIF|JPEG|jpeg))$)";
-//            Pattern p = Pattern.compile(regex);
-//            log.info(file.getContentType());
-//            Matcher m = p.matcher(Objects.requireNonNull(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()))));
-//            if (!m.matches()) {
-//                throw new OperationNotAllowedException("The file is not an image, allowed image extensions[jpeg|png|gif|bmp]");
-//            }
+            String imageExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+            if (!Arrays.asList(Constants.ALLOWED_IMAGES_FOR_SAVING).contains(imageExtension)) {
+                throw new OperationNotAllowedException("The image format is not allowed \n allowed formats[jpg, png, bmp, gif, jpeg]");
+            }
+
             if (ImageIO.read(file.getInputStream()) == null) {
                 throw new OperationNotAllowedException("The file is not an image");
             }
@@ -190,6 +186,16 @@ public class CommunityServiceImpl implements CommunityService {
         AnswerEntity answerEntity = null;
         ObjectMapper mapper = new ObjectMapper();
         AnswerRequest answerRequest = mapper.readValue(answerConv, AnswerRequest.class);
+
+        String imageExtension = FilenameUtils.getExtension(image.getOriginalFilename());
+
+        if (!Arrays.asList(Constants.ALLOWED_IMAGES_FOR_SAVING).contains(imageExtension)) {
+            throw new OperationNotAllowedException("The image format is not allowed \n allowed formats[jpg, png, bmp, gif, jpeg]");
+        }
+
+        if (ImageIO.read(image.getInputStream()) == null) {
+            throw new OperationNotAllowedException("The file is not an image");
+        }
 
         if (image == null) {
             answerEntity = AnswerEntity.builder()
@@ -384,13 +390,13 @@ public class CommunityServiceImpl implements CommunityService {
     public ResponseEntity<IssueModel> resolveAnIssue(String issueUuid, String userUuid) {
 
         IssueEntity issueEntity = issueRepository.findByUuid(issueUuid).orElseThrow(
-                ()-> new EntityNotFoundException("No issue found with the given id")
+                () -> new EntityNotFoundException("No issue found with the given id")
         );
 
         UserEntity userEntity = userRepository.findByUuid(userUuid).orElseThrow(
-                ()-> new EntityNotFoundException("No user with the given id")
+                () -> new EntityNotFoundException("No user with the given id")
         );
-        if(!issueEntity.getUser().getUuid().equals(userEntity.getUuid())){
+        if (!issueEntity.getUser().getUuid().equals(userEntity.getUuid())) {
             throw new OperationNotAllowedException("You cannot mark an issue as resolved that you didnt create");
         }
         issueEntity.setIssueStatus(EIssueStatus.RESOLVED);

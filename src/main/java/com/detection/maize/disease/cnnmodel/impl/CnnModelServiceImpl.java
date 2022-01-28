@@ -7,10 +7,12 @@ import com.detection.maize.disease.disease.entity.SymptomEntity;
 import com.detection.maize.disease.disease.payload.GetDiseaseResponse;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
+import com.detection.maize.disease.exception.OperationNotAllowedException;
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,12 +59,18 @@ public class CnnModelServiceImpl implements CnnModelService {
         int width = 215;
         int channels = 3;
 
-        if(image.isEmpty()){
+        if (image.isEmpty()) {
             throw new IOException("Image cannot be null");
         }
+        if (ImageIO.read(image.getInputStream()) == null) {
+            throw new OperationNotAllowedException("The file is not an image");
+        }
+
         MultiLayerNetwork model = this.loadModel();
 
         NativeImageLoader loader = new NativeImageLoader(height, width, channels);
+
+
 
         INDArray inputImage = loader.asMatrix(image.getInputStream());
 

@@ -73,6 +73,10 @@ public class AnswerEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name="answer_id"))
     List<UserEntity> answerDislikes = new ArrayList<>();
 
+
+    @OneToOne(mappedBy = "issue")
+    FileSystemImage ans;
+
     //helper functions for updating votes on issues
     public void addAnswerLike(UserEntity user) {
         answerLikes.add(user);
