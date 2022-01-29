@@ -10,16 +10,15 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="diseases_table")
+@Table(name="diseases_table", indexes = {
+        @Index(name = "disease_name_index", columnList = "disease_name"),
+        @Index(name = "disease_uuid_index", columnList = "uuid")})
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor

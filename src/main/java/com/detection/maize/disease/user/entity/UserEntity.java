@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="users_table")
+@Table(name="users_table", indexes = {
+        @Index(name = "user_uuid_index", columnList = "uuid")})
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor

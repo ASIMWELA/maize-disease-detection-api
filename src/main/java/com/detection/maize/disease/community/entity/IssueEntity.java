@@ -19,7 +19,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="issues_table")
+@Table(name="issues_table", indexes = {
+        @Index(name = "issue_uuid_index", columnList = "uuid")})
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
