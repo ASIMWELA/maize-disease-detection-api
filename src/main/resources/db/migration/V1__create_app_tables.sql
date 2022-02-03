@@ -116,14 +116,12 @@ create table users_table
     password  varchar(200) not null,
     primary key (id)
 );
-
 create index answer_uuid_index on answers_table (uuid);
 
 alter table if exists answers_table
     add constraint UK_cg6bv1e34ik7sp08wlld3rxnb unique (uuid);
 
 create index disease_name_index on diseases_table (disease_name);
-
 create index disease_uuid_index on diseases_table (uuid);
 
 alter table if exists diseases_table
@@ -140,6 +138,7 @@ alter table if exists file_system_image
 
 alter table if exists file_system_image
     add constraint UK_e26q53il5xmcpbt1vas0hsx4d unique (uuid);
+
 create index issue_uuid_index on issues_table (uuid);
 
 alter table if exists issues_table

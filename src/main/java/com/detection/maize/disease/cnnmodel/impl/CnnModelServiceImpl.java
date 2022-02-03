@@ -12,7 +12,7 @@ import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -24,8 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +47,19 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
-        File modelLocation = new ClassPathResource("maize-disease-model.zip").getFile();
+        InputStream ioStream = this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("maize-disease-model.zip");
+        //File modelLocation = new File(ioStream.);
+        File modelLocation = null;
+        File outputFile = new File( "model.zip");
+        if (outputFile.exists()) {
+            modelLocation = new File("model.zip");
+        }else{
+            assert ioStream != null;
+            FileUtils.copyInputStreamToFile(ioStream, outputFile);
+            modelLocation = new File("model.zip");
+        }
         return MultiLayerNetwork.load(modelLocation, false);
     }
 
