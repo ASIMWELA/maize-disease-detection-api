@@ -47,15 +47,15 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
-        InputStream ioStream = this.getClass()
-                .getClassLoader()
-                .getResourceAsStream("maize-disease-model.zip");
-        //File modelLocation = new File(ioStream.);
+                //File modelLocation = new File(ioStream.);
         File modelLocation = null;
         File outputFile = new File( "model.zip");
         if (outputFile.exists()) {
             modelLocation = new File("model.zip");
         }else{
+            InputStream ioStream = this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("maize-disease-model.zip");
             assert ioStream != null;
             FileUtils.copyInputStreamToFile(ioStream, outputFile);
             modelLocation = new File("model.zip");
