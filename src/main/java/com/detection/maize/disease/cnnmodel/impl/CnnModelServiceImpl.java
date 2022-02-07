@@ -8,6 +8,7 @@ import com.detection.maize.disease.disease.payload.GetDiseaseResponse;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
 import com.detection.maize.disease.exception.OperationNotAllowedException;
+import com.detection.maize.disease.exception.OperationNotSuccessfulException;
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -44,22 +45,28 @@ public class CnnModelServiceImpl implements CnnModelService {
     @Override
     @SneakyThrows
     public MultiLayerNetwork loadModel() {
+        File modelLocation = null;
+        File outputFile = new File( "model.zip");
+        try{
+            if (outputFile.exists()) {
+                modelLocation = new File("model.zip");
+            }else{
+                InputStream ioStream = this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("maize-disease-model.zip");
+                assert ioStream != null;
+                FileUtils.copyInputStreamToFile(ioStream, outputFile);
+                ioStream.close();
+                modelLocation = new File("model.zip");
+            }
 
+        }catch(EOFException ex){
+
+        }
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
                 //File modelLocation = new File(ioStream.);
-        File modelLocation = null;
-        File outputFile = new File( "model.zip");
-        if (outputFile.exists()) {
-            modelLocation = new File("model.zip");
-        }else{
-            InputStream ioStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("maize-disease-model.zip");
-            assert ioStream != null;
-            FileUtils.copyInputStreamToFile(ioStream, outputFile);
-            modelLocation = new File("model.zip");
-        }
+
         return MultiLayerNetwork.load(modelLocation, false);
     }
 
@@ -99,6 +106,10 @@ public class CnnModelServiceImpl implements CnnModelService {
         for (int i = 1; i < outputProbabilities.length; i++) {
             if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
         }
+        double accuracyProbability = outputProbabilities[indexOfLarge];
+        if(accuracyProbability < 0.59){
+            throw new OperationNotSuccessfulException("We are unable to correctly detect the disease. Consider creating an issue in the issue community");
+        }
         String diseaseName = diseaseTrainedOrder[indexOfLarge];
         DiseaseEntity diseaseEntity = diseaseRepository.findByDiseaseName(diseaseName).orElseThrow(
                 () -> new EntityNotFoundException("Oops! seems like our model doesnt recognise the disease\n consider creating an issue in the community")
@@ -109,6 +120,7 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         return ResponseEntity.ok(GetDiseaseResponse.builder()
                 .diseaseName(diseaseEntity.getDiseaseName())
+                .accuracy(String.format("%.2f", accuracyProbability * 100))
                 .diseaseUuid(diseaseEntity.getUuid())
                 .prescriptions(prescriptions)
                 .symptoms(symptoms)

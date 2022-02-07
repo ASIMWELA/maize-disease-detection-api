@@ -60,6 +60,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(OperationNotSuccessfulException.class)
+    protected ResponseEntity<Object> handleOperationNotSuccesfulException(OperationNotSuccessfulException ex) {
+        ApiException apiError = new ApiException(BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        apiError.setCode(apiError.getStatus().value());
+        return buildResponseEntity(apiError);
+    }
+
     @ExceptionHandler(ValidationException.class)
     protected ResponseEntity<Object> handleValidationErrors(ValidationException ex) {
         ApiException apiError = new ApiException(BAD_REQUEST);

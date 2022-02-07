@@ -13,6 +13,7 @@ import java.util.List;
 public class GetDiseaseResponse extends RepresentationModel<GetDiseaseResponse> {
     String diseaseUuid;
     String diseaseName;
+    String accuracy;
     List<String> symptoms;
     List<String> prescriptions;
 }
