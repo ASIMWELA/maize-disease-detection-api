@@ -121,16 +121,6 @@
             <artifactId>datavec-api</artifactId>
             <version>${dl4j-master.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.datavec</groupId>-->
-<!--            <artifactId>datavec-data-image</artifactId>-->
-<!--            <version>${dl4j-master.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.datavec</groupId>-->
-<!--            <artifactId>datavec-local</artifactId>-->
-<!--            <version>${dl4j-master.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-core</artifactId>
@@ -154,22 +144,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-shade-plugin</artifactId>-->
-<!--                <version>3.2.4</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>shade</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <minimizeJar>true</minimizeJar>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
