@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
@@ -45,36 +46,20 @@ public class CnnModelServiceImpl implements CnnModelService {
     @Override
     @SneakyThrows
     public MultiLayerNetwork loadModel() {
-        File modelLocation = null;
-        File outputFile = new File( "model.zip");
-        try{
-            if (outputFile.exists()) {
-                modelLocation = new File("model.zip");
-            }else{
-                InputStream ioStream = this.getClass()
-                        .getClassLoader()
-                        .getResourceAsStream("maize-disease-model.zip");
-                assert ioStream != null;
-                FileUtils.copyInputStreamToFile(ioStream, outputFile);
-                ioStream.close();
-                modelLocation = new File("model.zip");
-            }
 
-        }catch(EOFException ex){
-
-        }
+        InputStream ioStream = this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("maize-disease-model.zip");
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
-                //File modelLocation = new File(ioStream.);
-
-        return MultiLayerNetwork.load(modelLocation, false);
+        return ModelSerializer.restoreMultiLayerNetwork(ioStream, false);
     }
 
     @Override
     @SneakyThrows
     public ResponseEntity<GetDiseaseResponse> detectDisease(MultipartFile image) {
-        int height = 215;
-        int width = 215;
+        int height = 220;
+        int width = 220;
         int channels = 3;
 
         if (image.isEmpty()) {
@@ -89,7 +74,6 @@ public class CnnModelServiceImpl implements CnnModelService {
         NativeImageLoader loader = new NativeImageLoader(height, width, channels);
 
 
-
         INDArray inputImage = loader.asMatrix(image.getInputStream());
 
         DataNormalization scalar = new ImagePreProcessingScaler(0, 1);
@@ -97,7 +81,7 @@ public class CnnModelServiceImpl implements CnnModelService {
 
         String[] diseaseTrainedOrder = {"Gray leaf spot", "Common rust", "Northern leaf blight", "Health"};
 
-        INDArray output = model.output(inputImage.reshape(new int[]{1, 3, 215, 215}));
+        INDArray output = model.output(inputImage.reshape(new int[]{1, 3, width, height}));
 
         double[] outputProbabilities = Arrays.stream(output.toDoubleVector()).toArray();
         log.info("Probabilities : " + Arrays.toString(outputProbabilities));
@@ -107,7 +91,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
         }
         double accuracyProbability = outputProbabilities[indexOfLarge];
-        if(accuracyProbability < 0.59){
+        if (accuracyProbability < 0.55) {
             throw new OperationNotSuccessfulException("We are unable to correctly detect the disease. Consider creating an issue in the issue community");
         }
         String diseaseName = diseaseTrainedOrder[indexOfLarge];
