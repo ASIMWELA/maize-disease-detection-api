@@ -24,7 +24,6 @@
         <exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
         <jcommon.version>1.0.23</jcommon.version>
-        <jfreechart.version>1.0.13</jfreechart.version>
         <logback.version>1.1.7</logback.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javacv.version>1.5.5</javacv.version>
@@ -88,10 +87,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->
-<!--            <artifactId>jackson-datatype-hibernate5</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -115,17 +110,28 @@
             <groupId>org.nd4j</groupId>
             <artifactId>${nd4j.backend}</artifactId>
             <version>${dl4j-master.version}</version>
+
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.datavec/datavec-data-image -->
         <dependency>
             <groupId>org.datavec</groupId>
-            <artifactId>datavec-api</artifactId>
-            <version>${dl4j-master.version}</version>
+            <artifactId>datavec-data-image</artifactId>
+            <version>1.0.0-M1.1</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.deeplearning4j</groupId>-->
+<!--            <artifactId>deeplearning4j-core</artifactId>-->
+<!--            <version>${dl4j-master.version}</version>-->
+<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-nn -->
         <dependency>
             <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-core</artifactId>
-            <version>${dl4j-master.version}</version>
+            <artifactId>deeplearning4j-nn</artifactId>
+            <version>1.0.0-M1</version>
         </dependency>
+
 
     </dependencies>
 

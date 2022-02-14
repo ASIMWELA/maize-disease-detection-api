@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -45,13 +48,23 @@ public class CnnModelServiceImpl implements CnnModelService {
     @Override
     @SneakyThrows
     public MultiLayerNetwork loadModel() {
+        File modelLocation = new File("model.zip");
+        if(!modelLocation.exists()){
+            try{
+                InputStream ioStream = this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("maize-disease-model.zip");
+                FileUtils.copyInputStreamToFile(ioStream, modelLocation);
+                ioStream.close();
+            }catch (EOFException exception){
+                    exception.printStackTrace();
+            }
 
-        InputStream ioStream = this.getClass()
-                .getClassLoader()
-                .getResourceAsStream("maize-disease-model.zip");
+        }
+
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
-        return ModelSerializer.restoreMultiLayerNetwork(ioStream, false);
+        return ModelSerializer.restoreMultiLayerNetwork(modelLocation, false);
     }
 
     @Override
@@ -69,6 +82,7 @@ public class CnnModelServiceImpl implements CnnModelService {
         }
 
         MultiLayerNetwork model = this.loadModel();
+
 
         NativeImageLoader loader = new NativeImageLoader(height, width, channels);
 

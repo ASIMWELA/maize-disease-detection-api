@@ -47,6 +47,9 @@ server:
     include-binding-errors: always
     include-exception: false
     include-stacktrace: on_param
+  tomcat:
+    connection-timeout: 70000
+
 management:
   endpoints:
     web:
