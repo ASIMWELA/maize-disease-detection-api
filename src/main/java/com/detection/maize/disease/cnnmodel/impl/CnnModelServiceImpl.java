@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CnnModelServiceImpl implements CnnModelService {
 
-    DiseaseRepository diseaseRepository;
+    private DiseaseRepository diseaseRepository;
 
     public CnnModelServiceImpl(DiseaseRepository diseaseRepository) {
         this.diseaseRepository = diseaseRepository;
@@ -104,7 +104,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
         }
         double accuracyProbability = outputProbabilities[indexOfLarge];
-        if (accuracyProbability < 0.55) {
+        if (accuracyProbability < 0.60) {
             throw new OperationNotSuccessfulException("We are unable to correctly detect the disease. Consider creating an issue in the issue community");
         }
         String diseaseName = diseaseTrainedOrder[indexOfLarge];

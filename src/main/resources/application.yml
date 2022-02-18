@@ -6,7 +6,6 @@ app:
 spring:
   flyway:
     enabled: true
-
   servlet:
     multipart:
       enabled: true
