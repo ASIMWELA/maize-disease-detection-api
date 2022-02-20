@@ -104,7 +104,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
         }
         double accuracyProbability = outputProbabilities[indexOfLarge];
-        if (accuracyProbability < 0.60) {
+        if (accuracyProbability < 0.65) {
             throw new OperationNotSuccessfulException("We are unable to correctly detect the disease. Consider creating an issue in the issue community");
         }
         String diseaseName = diseaseTrainedOrder[indexOfLarge];
