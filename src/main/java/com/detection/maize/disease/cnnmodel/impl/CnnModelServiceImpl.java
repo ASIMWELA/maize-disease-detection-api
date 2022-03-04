@@ -8,7 +8,6 @@ import com.detection.maize.disease.disease.payload.GetDiseaseResponse;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
 import com.detection.maize.disease.exception.OperationNotAllowedException;
-import com.detection.maize.disease.exception.OperationNotSuccessfulException;
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -54,7 +53,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             try{
                 InputStream ioStream = this.getClass()
                         .getClassLoader()
-                        .getResourceAsStream("maize-disease-model_.zip");
+                        .getResourceAsStream("maize-disease-model.zip");
              FileCopyUtils.copy(IOUtils.toByteArray(ioStream), modelLocation);
             }catch (EOFException exception){
                     exception.printStackTrace();
