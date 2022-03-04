@@ -13,7 +13,7 @@ import lombok.AccessLevel;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
@@ -22,6 +22,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -54,7 +55,7 @@ public class CnnModelServiceImpl implements CnnModelService {
                 InputStream ioStream = this.getClass()
                         .getClassLoader()
                         .getResourceAsStream("maize-disease-model_.zip");
-                FileUtils.copyInputStreamToFile(ioStream, modelLocation);
+             FileCopyUtils.copy(IOUtils.toByteArray(ioStream), modelLocation);
             }catch (EOFException exception){
                     exception.printStackTrace();
             }
