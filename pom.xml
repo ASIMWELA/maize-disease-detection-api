@@ -112,26 +112,12 @@
             <version>${dl4j-master.version}</version>
 
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.datavec/datavec-data-image -->
-        <dependency>
-            <groupId>org.datavec</groupId>
-            <artifactId>datavec-data-image</artifactId>
-            <version>1.0.0-M1.1</version>
-        </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.deeplearning4j</groupId>-->
-<!--            <artifactId>deeplearning4j-core</artifactId>-->
-<!--            <version>${dl4j-master.version}</version>-->
-<!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-nn -->
         <dependency>
             <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-nn</artifactId>
-            <version>1.0.0-M1</version>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>${dl4j-master.version}</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-nn -->
 
     </dependencies>
 

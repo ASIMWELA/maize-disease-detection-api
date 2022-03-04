@@ -53,7 +53,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             try{
                 InputStream ioStream = this.getClass()
                         .getClassLoader()
-                        .getResourceAsStream("maize-disease-model.zip");
+                        .getResourceAsStream("maize-disease-model_.zip");
                 FileUtils.copyInputStreamToFile(ioStream, modelLocation);
                 ioStream.close();
             }catch (EOFException exception){
@@ -70,8 +70,8 @@ public class CnnModelServiceImpl implements CnnModelService {
     @Override
     @SneakyThrows
     public ResponseEntity<GetDiseaseResponse> detectDisease(MultipartFile image) {
-        int height = 220;
-        int width = 220;
+        int height = 200;
+        int width = 200;
         int channels = 3;
 
         if (image.isEmpty()) {
@@ -104,9 +104,6 @@ public class CnnModelServiceImpl implements CnnModelService {
             if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
         }
         double accuracyProbability = outputProbabilities[indexOfLarge];
-        if (accuracyProbability < 0.65) {
-            throw new OperationNotSuccessfulException("We are unable to correctly detect the disease. Consider creating an issue in the issue community");
-        }
         String diseaseName = diseaseTrainedOrder[indexOfLarge];
         DiseaseEntity diseaseEntity = diseaseRepository.findByDiseaseName(diseaseName).orElseThrow(
                 () -> new EntityNotFoundException("Oops! seems like our model doesnt recognise the disease\n consider creating an issue in the community")
