@@ -55,7 +55,6 @@ public class CnnModelServiceImpl implements CnnModelService {
                         .getClassLoader()
                         .getResourceAsStream("maize-disease-model_.zip");
                 FileUtils.copyInputStreamToFile(ioStream, modelLocation);
-                ioStream.close();
             }catch (EOFException exception){
                     exception.printStackTrace();
             }
