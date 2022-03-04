@@ -53,7 +53,7 @@ public class CnnModelServiceImpl implements CnnModelService {
             try{
                 InputStream ioStream = this.getClass()
                         .getClassLoader()
-                        .getResourceAsStream("maize-disease-model.zip");
+                        .getResourceAsStream("maize-model.zip");
              FileCopyUtils.copy(IOUtils.toByteArray(ioStream), modelLocation);
             }catch (EOFException exception){
                     exception.printStackTrace();
