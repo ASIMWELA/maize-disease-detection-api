@@ -85,9 +85,14 @@ public class CnnModelServiceImpl implements CnnModelService {
 
 
         NativeImageLoader loader = new NativeImageLoader(height, width, channels);
-
-
-        INDArray inputImage = loader.asMatrix(image.getInputStream());
+        InputStream imageInputStream = null;
+        try{
+             imageInputStream = image.getInputStream();
+            imageInputStream.close();
+        }catch (EOFException ex){
+            ex.printStackTrace();
+        }
+        INDArray inputImage = loader.asMatrix(imageInputStream);
 
         DataNormalization scalar = new ImagePreProcessingScaler(0, 1);
         scalar.transform(inputImage);
