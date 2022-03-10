@@ -1,9 +1,11 @@
 package com.detection.maize.disease.cnnmodel.impl;
 
+import com.detection.maize.disease.cnnmodel.CnnModelResponse;
 import com.detection.maize.disease.cnnmodel.CnnModelService;
 import com.detection.maize.disease.disease.entity.DiseaseEntity;
 import com.detection.maize.disease.disease.entity.PrescriptionEntity;
 import com.detection.maize.disease.disease.entity.SymptomEntity;
+import com.detection.maize.disease.disease.payload.CnnModelSecondProbableDisease;
 import com.detection.maize.disease.disease.payload.GetDiseaseResponse;
 import com.detection.maize.disease.disease.repositoy.DiseaseRepository;
 import com.detection.maize.disease.exception.EntityNotFoundException;
@@ -32,6 +34,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -68,7 +71,7 @@ public class CnnModelServiceImpl implements CnnModelService {
 
     @Override
     @SneakyThrows
-    public ResponseEntity<GetDiseaseResponse> detectDisease(MultipartFile image) {
+    public ResponseEntity<CnnModelResponse> detectDisease(MultipartFile image) {
         int height = 200;
         int width = 200;
         int channels = 3;
@@ -98,24 +101,55 @@ public class CnnModelServiceImpl implements CnnModelService {
         log.info("Probabilities : " + Arrays.toString(outputProbabilities));
         log.info("Key : " + "{Gray leaf spot, Common rust, Northern leaf blight, Health}");
         int indexOfLarge = 0;
+        double[] sorted = Arrays.stream(outputProbabilities).toArray();
+        double secondPercentage = sorted[sorted.length-2];
+        int indexOfSecond = 0;
+
         for (int i = 1; i < outputProbabilities.length; i++) {
-            if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) indexOfLarge = i;
+            if (outputProbabilities[i] > outputProbabilities[indexOfLarge]) {
+                indexOfLarge = i;
+            }
+            if(secondPercentage == outputProbabilities[i]){
+                indexOfSecond = i;
+            }
         }
+
+
+        //highly probable
         double accuracyProbability = outputProbabilities[indexOfLarge];
+        double secondAccuracy = outputProbabilities[indexOfSecond];
         String diseaseName = diseaseTrainedOrder[indexOfLarge];
         DiseaseEntity diseaseEntity = diseaseRepository.findByDiseaseName(diseaseName).orElseThrow(
                 () -> new EntityNotFoundException("Oops! seems like our model doesnt recognise the disease\n consider creating an issue in the community")
         );
         List<String> symptoms = diseaseEntity.getSymptoms().stream().map(SymptomEntity::getSymptomDescription).collect(Collectors.toList());
-
         List<String> prescriptions = diseaseEntity.getPrescriptions().stream().map(PrescriptionEntity::getDiseasePrescription).collect(Collectors.toList());
 
-        return ResponseEntity.ok(GetDiseaseResponse.builder()
+
+        //less probable
+        String secondDiseaseName = diseaseTrainedOrder[indexOfSecond];
+        DiseaseEntity secondDiseaseEntity = diseaseRepository.findByDiseaseName(secondDiseaseName).orElseThrow(
+                ()-> new EntityNotFoundException("No disease with the given identifier")
+        );
+        CnnModelSecondProbableDisease secondDisease =
+                CnnModelSecondProbableDisease.builder()
+                        .diseaseName(secondDiseaseEntity.getDiseaseName())
+                        .uuid(secondDiseaseEntity.getUuid())
+                        .percentage(String.format("%.2f", secondAccuracy * 100))
+                        .build();
+
+        GetDiseaseResponse firstDisease = GetDiseaseResponse.builder()
                 .diseaseName(diseaseEntity.getDiseaseName())
                 .accuracy(String.format("%.2f", accuracyProbability * 100))
                 .diseaseUuid(diseaseEntity.getUuid())
                 .prescriptions(prescriptions)
                 .symptoms(symptoms)
-                .build());
+                .build();
+        return  ResponseEntity.ok(
+                CnnModelResponse.builder()
+                        .firstDisease(firstDisease)
+                        .secondDisease(secondDisease)
+                        .build()
+        );
     }
 }

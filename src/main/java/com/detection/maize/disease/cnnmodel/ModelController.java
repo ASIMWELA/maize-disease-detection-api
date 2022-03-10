@@ -21,7 +21,7 @@ public class ModelController {
     }
 
     @PostMapping("/detect")
-    public ResponseEntity<GetDiseaseResponse> detectDisease(@RequestParam("image") MultipartFile image){
+    public ResponseEntity<CnnModelResponse> detectDisease(@RequestParam("image") MultipartFile image){
         return modelService.detectDisease(image);
     }
 }

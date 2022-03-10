@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface CnnModelService {
     MultiLayerNetwork loadModel();
-    ResponseEntity<GetDiseaseResponse> detectDisease(MultipartFile image);
+    ResponseEntity<CnnModelResponse> detectDisease(MultipartFile image);
 }
