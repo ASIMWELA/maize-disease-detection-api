@@ -131,11 +131,18 @@ public class CnnModelServiceImpl implements CnnModelService {
         DiseaseEntity secondDiseaseEntity = diseaseRepository.findByDiseaseName(secondDiseaseName).orElseThrow(
                 ()-> new EntityNotFoundException("No disease with the given identifier")
         );
+
+        List<String> symptoms2 = secondDiseaseEntity.getSymptoms().stream().map(SymptomEntity::getSymptomDescription).collect(Collectors.toList());
+        List<String> prescriptions2 = secondDiseaseEntity.getPrescriptions().stream().map(PrescriptionEntity::getDiseasePrescription).collect(Collectors.toList());
+
+
         CnnModelSecondProbableDisease secondDisease =
                 CnnModelSecondProbableDisease.builder()
                         .diseaseName(secondDiseaseEntity.getDiseaseName())
-                        .uuid(secondDiseaseEntity.getUuid())
-                        .percentage(String.format("%.2f", secondAccuracy * 100))
+                        .diseaseUuid(secondDiseaseEntity.getUuid())
+                        .prescriptions(prescriptions2)
+                        .symptoms(symptoms2)
+                        .accuracy(String.format("%.2f", secondAccuracy * 100))
                         .build();
 
         GetDiseaseResponse firstDisease = GetDiseaseResponse.builder()
