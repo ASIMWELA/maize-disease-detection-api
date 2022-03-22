@@ -20,6 +20,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author Augustine Simwela
+ * AuthService implementation
+ * implements the authentication and authorization logic of the application
+ * implements {@link AuthService} interface
+ */
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,7 +33,12 @@ public class AuthServiceImpl implements AuthService {
     AuthenticationManager authenticationManager;
     JwtTokenProvider tokenProvider;
     UserRepository userRepository;
-
+    /**
+     * constructor
+     * @param authenticationManager
+     * @param tokenProvider
+     * @param userRepository
+     */
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            JwtTokenProvider tokenProvider,
                            UserRepository userRepository) {
@@ -36,6 +47,13 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * constructor
+     * @param loginRequest
+     * @return loggedIn user of {@link LoginResponse} containing token and user details
+     * @see TokenPayload
+     * @see UserModel
+     */
     @Override
     @Transactional
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {

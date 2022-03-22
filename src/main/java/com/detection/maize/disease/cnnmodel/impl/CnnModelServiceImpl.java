@@ -36,6 +36,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author Augustine Simwela
+ * CnnModelService that deals with loading and
+ * carrying out the inference of the sent image
+ * The class depends on @link DiseaseRe
+ */
+
 @Service
 @Slf4j
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -43,11 +50,21 @@ public class CnnModelServiceImpl implements CnnModelService {
 
     private DiseaseRepository diseaseRepository;
 
+    /**
+     * CnnModelService constructor that takes disease repository for fetching
+     * and returning the disease inference
+     * @param diseaseRepository
+     */
     public CnnModelServiceImpl(DiseaseRepository diseaseRepository) {
         this.diseaseRepository = diseaseRepository;
     }
 
 
+    /**
+     * loadModel()
+     * loads and return the multilayer network located in the resources folder
+     * @return MultilayerNetwork
+     */
     @Override
     @SneakyThrows
     public MultiLayerNetwork loadModel() {
@@ -63,12 +80,19 @@ public class CnnModelServiceImpl implements CnnModelService {
             }
 
         }
-
         //Where to save the network. Note: the file is in .zip format - can be opened externally
         //Load the model
         return ModelSerializer.restoreMultiLayerNetwork(modelLocation, false);
     }
 
+    /**
+     * detectDisease()
+     * Gets an image and returns the top two diseases
+     * with the highest probabilities by using the loaded model
+     * uses loadModel method for loading the method
+     * @param image a class  Multipart file
+     * @return CnnModelResponse
+     */
     @Override
     @SneakyThrows
     public ResponseEntity<CnnModelResponse> detectDisease(MultipartFile image) {

@@ -187,16 +187,6 @@ public class CommunityServiceImpl implements CommunityService {
         ObjectMapper mapper = new ObjectMapper();
         AnswerRequest answerRequest = mapper.readValue(answerConv, AnswerRequest.class);
 
-        String imageExtension = FilenameUtils.getExtension(image.getOriginalFilename());
-
-        if (!Arrays.asList(Constants.ALLOWED_IMAGES_FOR_SAVING).contains(imageExtension)) {
-            throw new OperationNotAllowedException("The image format is not allowed \n allowed formats[jpg, png, bmp, gif, jpeg]");
-        }
-
-        if (ImageIO.read(image.getInputStream()) == null) {
-            throw new OperationNotAllowedException("The file is not an image");
-        }
-
         if (image == null) {
             answerEntity = AnswerEntity.builder()
                     .answerContent(answerRequest.getAnswer())
@@ -207,6 +197,15 @@ public class CommunityServiceImpl implements CommunityService {
                     .issue(issue)
                     .build();
         } else {
+            String imageExtension = FilenameUtils.getExtension(image.getOriginalFilename());
+
+            if (!Arrays.asList(Constants.ALLOWED_IMAGES_FOR_SAVING).contains(imageExtension)) {
+                throw new OperationNotAllowedException("The image format is not allowed \n allowed formats[jpg, png, bmp, gif, jpeg]");
+            }
+
+            if (ImageIO.read(image.getInputStream()) == null) {
+                throw new OperationNotAllowedException("The file is not an image");
+            }
             answerEntity = AnswerEntity.builder()
                     .answerContent(answerRequest.getAnswer())
                     .createdAt(new Date())
