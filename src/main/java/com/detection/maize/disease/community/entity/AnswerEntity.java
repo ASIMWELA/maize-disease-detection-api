@@ -15,6 +15,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *@author Augustine Simwela
+ *
+ * A Pojo that tanslates into a database tabale using JPA
+ *
+ * COnfigures all the related relationships
+ *
+ * see {@link UserEntity} and {@link IssueEntity}
+ */
 @Entity
 @Table(name="answers_table", indexes = {
         @Index(name = "answer_uuid_index", columnList = "uuid")})

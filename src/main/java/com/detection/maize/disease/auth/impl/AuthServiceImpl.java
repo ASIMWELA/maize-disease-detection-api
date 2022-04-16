@@ -22,22 +22,37 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Augustine Simwela
+ * <p>
  * AuthService implementation
+ * <p>
  * implements the authentication and authorization logic of the application
+ * </p>
  * implements {@link AuthService} interface
  */
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthServiceImpl implements AuthService {
-    AuthenticationManager authenticationManager;
-    JwtTokenProvider tokenProvider;
-    UserRepository userRepository;
     /**
-     * constructor
-     * @param authenticationManager
-     * @param tokenProvider
-     * @param userRepository
+     * Manages authentication sessions
+     */
+    AuthenticationManager authenticationManager;
+
+    /**
+     * Utility class for generating and validating tokens
+     */
+    JwtTokenProvider tokenProvider;
+    /**
+     * DAO layer for interacting with the database
+     */
+    UserRepository userRepository;
+
+    /**
+     * @param authenticationManager  facilitates the flow of jwt. See {@link AuthenticationManager}
+     * 
+     * @param tokenProvider Utility for generating th token. See {@link JwtTokenProvider}
+     * 
+     * @param userRepository An abstraction for communication with database. See {@link UserRepository}
      */
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            JwtTokenProvider tokenProvider,
@@ -49,9 +64,14 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * constructor
-     * @param loginRequest
+     *
+     * @param loginRequest .Contains username and password for a
+     *  user who is attempting to authenticate
+
      * @return loggedIn user of {@link LoginResponse} containing token and user details
+
      * @see TokenPayload
+
      * @see UserModel
      */
     @Override

@@ -8,6 +8,13 @@ import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * @author AUgustine
+ *
+ * Holds values that a users sends when he/she is trying to login into the application
+ *
+ * The users has to send email and paword and both should not be empty
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,4 +1,11 @@
 package com.detection.maize.disease.community.enums;
- public enum EIssueStatus {
+
+/**
+ * @author Augustine Simwela
+ * 
+ * 
+ * Represents issue status
+  */
+public enum EIssueStatus {
      OPEN, RESOLVED
 }

@@ -1,5 +1,11 @@
 package com.detection.maize.disease.community.entity;
 
+/**
+ *@author Augustine Simwela
+A Pojo that That keep images metadata stored in the file system into a database table using JPA
+COnfigures all the related relationships with {@link IssueEntity} and {@link com.detection.maize.disease.community.entity.AnswerEntity}
+
+ */
 import com.detection.maize.disease.commons.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -13,15 +13,45 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * @author Augustine Simwela
+ *
+ * A processor of answer entities
+ *
+ * All answer Models passes here before being returned to the user
+ *
+ * Transforms the models to include links for all those models with images
+ */
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerModelProcessor implements RepresentationModelProcessor<AnswerModel> {
+
+    /**
+     * A DAO layer for accessing this answer
+     */
     AnswerRepository answerRepository;
 
+    /**
+     * Constructs an object of this class
+     *
+     * @param answerRepository of {@link AnswerRepository}
+     */
     public AnswerModelProcessor(AnswerRepository answerRepository) {
         this.answerRepository = answerRepository;
     }
 
+
+    /**
+     * Tranforms an answer model to include a link of its image if it contains an image
+     *
+     * @param model of {@link AnswerModel}
+     *
+     * @return AnswerModel
+     *
+     * @see AnswerModel
+     *
+     * @see AnswerEntity
+     */
     @Override
     @Transactional
     public AnswerModel process(AnswerModel model) {

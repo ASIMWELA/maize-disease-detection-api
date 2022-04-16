@@ -17,6 +17,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+/**
+ *@author Augustine Simwela
+ * A Pojo that tanslates into a database tabale using JPA
+ *
+ * Representes all the issues in the community section.
+ *
+ * Keeps track of who created the issue and when by linking {@link UserEntity}
+ *
+ * Also keep track the likes and dislikes of this particular issue
+ */
 
 @Entity
 @Table(name="issues_table", indexes = {

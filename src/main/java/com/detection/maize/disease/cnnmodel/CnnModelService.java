@@ -6,15 +6,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Augustine Simwela
- * CnnModelService interface.
- * Defines the contact for implementing the CnnModelService
- * defines the main contracts namely @link loadModel and @link detectDisease
+ *
+ * Defines the contact for implementing the CnnModelServic
  */
 public interface CnnModelService {
+
+    /**
+     * contract method for loading a multilayer model
+     * @return {@link MultiLayerNetwork}
+     */
     MultiLayerNetwork loadModel();
 
     /**
-     *
+     * Contract for to be implemented to return the top two probable diseases
      * @param image of class {@link MultipartFile}
      * @return top two diseases
      */

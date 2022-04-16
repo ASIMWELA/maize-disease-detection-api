@@ -6,8 +6,10 @@ import lombok.*;
 
 /**
  *@author Augustine Simwela
-CnnModelResponse
- a container class that returns the top two highly likely diseases
+ *
+ *Wrapper class for returning  the top two highly likely diseases
+ *
+ * Uses {@link GetDiseaseResponse} for returning trhe first disease and {@link CnnModelSecondProbableDisease} for the second disease
  */
 @Getter
 @Setter

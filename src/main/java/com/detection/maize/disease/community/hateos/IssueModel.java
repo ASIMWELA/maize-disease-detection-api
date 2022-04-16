@@ -1,5 +1,6 @@
 package com.detection.maize.disease.community.hateos;
 
+import com.detection.maize.disease.community.entity.AnswerEntity;
 import com.detection.maize.disease.community.entity.IssueEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -14,6 +15,15 @@ import java.util.Date;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * @author Augustine Simwela
+ *
+ * An issue  DTO based on HATEAOS which generates self describing links
+ * <p>
+ * Adds total issues likes and dislikes before returning the DTO
+ * <p>
+ * Uses {@link JsonPropertyOrder} to arrange the return values in json
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -52,6 +62,16 @@ public class IssueModel extends RepresentationModel<IssueModel> {
     long issueDislikes;
     long issueAnswers;
 
+
+    /**
+     * A helper method to create an issue DTO from an entity
+     * <p>
+     * Maps {@link IssueEntity} into {@link IssueModel}
+     *
+     * @param entity of class {@link IssueEntity} that reflects a model that is directly stored on databse
+     *
+     *@return {@link IssueModel}
+     */
     public static IssueModel build(IssueEntity entity) {
         String createdBy = entity.getUser().getFirstName() + " " + entity.getUser().getLastName();
         int numberOfAnswers = 0;

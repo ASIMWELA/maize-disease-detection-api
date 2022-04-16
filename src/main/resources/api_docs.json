@@ -1,0 +1,1400 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Maize disease detection API Reference",
+    "description": "This api  houses all the logic that is required when interacting the maize leaf disease detection mobile clientIt contains mainly four parts. \n1. User account\n2. Diseases api\n3. Neural network model\n4. Community section",
+    "contact": {
+      "name": "Augustine Simwela",
+      "url": "https://github.com/ASIMWELA",
+      "email": "augastinesimwela@gmail.com"
+    },
+    "version": "API Version 1.0"
+  },
+  "tags": [
+    {
+      "name": "Community Controller",
+      "description": "Allows users to create issues for a failed detection. A user is also allowed to create an issue not related to crops"
+    },
+    {
+      "name": "Model Controller",
+      "description": "A user sends an image of a diseaded leaf for analysis"
+    },
+    {
+      "name": "User Controller",
+      "description": "A user sends a request to create an account"
+    },
+    {
+      "name": "Diseases Controller",
+      "description": "Affords adding diseases, symptoms , prescriptions and retrieving"
+    },
+    {
+      "name": "Authentication controller",
+      "description": "Allows users to pass their email and pwassord to be authenticated"
+    }
+  ],
+  "paths": {
+    "/api/v1/community/issues/up-vote/{issueUuid}/{userUuid}": {
+      "put": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Like an issue",
+        "operationId": "upVoteIssue",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues/resolve-issue/{issueUuid}/{userUuid}": {
+      "put": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Mark an issue as resolved",
+        "operationId": "resolve",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues/down-vote/{issueUuid}/{userUuid}": {
+      "put": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Dislike an issue",
+        "operationId": "downVoteIssue",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues/answers/like-answer/{issueUuid}/{answerUuid}/{userUuid}": {
+      "put": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Like an answer",
+        "operationId": "likeAnswer",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "answerUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagedResourcesAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerAnswerEntity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues/answers/dislike-answer/{issueUuid}/{answerUuid}/{userUuid}": {
+      "put": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Dislike an answer",
+        "operationId": "disLikeAnswer",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "answerUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagedResourcesAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerAnswerEntity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Create a user account if the information given is valid",
+        "operationId": "signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/model/detect": {
+      "post": {
+        "tags": [
+          "Model Controller"
+        ],
+        "summary": "Receives an image of a disased leaf and returns the result of inference",
+        "operationId": "detectDisease",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "image"
+                ],
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CnnModelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases": {
+      "get": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Get paginated diseases",
+        "operationId": "getDiseases",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedResourceAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerDiseaseEntity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Adds a disease to the database",
+        "operationId": "saveDisease",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiseaseEntity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases/symptoms/{diseaseUuid}": {
+      "post": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Add symptoms of a particular disease",
+        "operationId": "addDiseaseSymptoms",
+        "parameters": [
+          {
+            "name": "diseaseUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddSymptomRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases/prescriptions/{diseaseUuid}": {
+      "post": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Add prescriptions of a particular disease",
+        "operationId": "addDiseasePrescription",
+        "parameters": [
+          {
+            "name": "diseaseUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPrescriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/post-issue/{userUuid}": {
+      "post": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Creates an issue in the community. The same created issue is returned",
+        "operationId": "postAnIssue",
+        "parameters": [
+          {
+            "name": "issue",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues/answer/{issueUuid}/{userUuid}": {
+      "post": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Give an answer to a particular issue",
+        "operationId": "answerAnIssue",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedResourcesAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerAnswerEntity"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication controller"
+        ],
+        "summary": "Authenticate with the API",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases/{diseaseUuid}": {
+      "get": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Get a single disease with its symptoms and prescriptions",
+        "operationId": "getDisease",
+        "parameters": [
+          {
+            "name": "diseaseUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDiseaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases/get-symptoms/{diseaseUuid}": {
+      "get": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Get disease symptoms.Given the disease uuid, return the symptoms if the disease is found in the database otherwise throw 404 exception",
+        "operationId": "getDiseaseSymptoms",
+        "parameters": [
+          {
+            "name": "diseaseUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diseases/get-prescriptions/{diseaseUuid}": {
+      "get": {
+        "tags": [
+          "Diseases Controller"
+        ],
+        "summary": "Get a disease prescriptions. Given a disease uuid, return the prescriptions of that particular disease if the disease is found otherwise throw 404",
+        "operationId": "getDiseasePrescriptions",
+        "parameters": [
+          {
+            "name": "diseaseUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issues": {
+      "get": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Get paged issues",
+        "operationId": "getIssues",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedResourceAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerIssueEntity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/issue-image/{issueUuid}": {
+      "get": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Gets an image of a particular issue",
+        "operationId": "getIssueImageUrl",
+        "parameters": [
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "byte"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/answers/{issueUuid}": {
+      "get": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Get paged answers. Produces a paged model os issue answers",
+        "operationId": "getAnswers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "pagedResourceAssembler",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PagedResourcesAssemblerAnswerEntity"
+            }
+          },
+          {
+            "name": "issueUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/community/answers/answer-image/{answerUuid}": {
+      "get": {
+        "tags": [
+          "Community Controller"
+        ],
+        "summary": "Gets an image of a particular answer",
+        "operationId": "getAnswerImage",
+        "parameters": [
+          {
+            "name": "answerUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "byte"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IssueModel": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "crop": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "issueLikes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "issueStatus": {
+            "type": "string"
+          },
+          "issueDislikes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "issueAnswers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "questionDescription": {
+            "type": "string"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Link"
+        }
+      },
+      "PagedResourcesAssemblerAnswerEntity": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "PageMetadata": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PagedModelObject": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "SignupRequest": {
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "maxLength": 90,
+            "minLength": 2,
+            "type": "string"
+          },
+          "lastName": {
+            "maxLength": 90,
+            "minLength": 2,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 90,
+            "minLength": 2,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 15,
+            "minLength": 5,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "CnnModelResponse": {
+        "type": "object",
+        "properties": {
+          "firstDisease": {
+            "$ref": "#/components/schemas/GetDiseaseResponse"
+          },
+          "secondDisease": {
+            "$ref": "#/components/schemas/CnnModelSecondProbableDisease"
+          }
+        }
+      },
+      "CnnModelSecondProbableDisease": {
+        "type": "object",
+        "properties": {
+          "diseaseUuid": {
+            "type": "string"
+          },
+          "diseaseName": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "symptoms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GetDiseaseResponse": {
+        "type": "object",
+        "properties": {
+          "diseaseUuid": {
+            "type": "string"
+          },
+          "diseaseName": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "symptoms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "DiseaseEntity": {
+        "required": [
+          "diseaseName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "diseaseName": {
+            "type": "string"
+          }
+        }
+      },
+      "AddSymptomRequest": {
+        "required": [
+          "symptoms"
+        ],
+        "type": "object",
+        "properties": {
+          "symptoms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SymptomEntity"
+            }
+          }
+        }
+      },
+      "SymptomEntity": {
+        "required": [
+          "symptomDescription"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "symptomDescription": {
+            "type": "string"
+          }
+        }
+      },
+      "AddPrescriptionRequest": {
+        "required": [
+          "prescriptions"
+        ],
+        "type": "object",
+        "properties": {
+          "prescriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionEntity"
+            }
+          }
+        }
+      },
+      "PrescriptionEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "diseasePrescription": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "tokenPayload": {
+            "$ref": "#/components/schemas/TokenPayload"
+          },
+          "userData": {
+            "$ref": "#/components/schemas/UserModel"
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "ROLE_USER",
+              "ROLE_ADMIN"
+            ]
+          }
+        }
+      },
+      "TokenPayload": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "string"
+          }
+        }
+      },
+      "UserModel": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedResourcesAssemblerDiseaseEntity": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "CollectionModelObject": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedResourcesAssemblerIssueEntity": {
+        "type": "object",
+        "properties": {
+          "forceFirstAndLastRels": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "hreflang": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "deprecation": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "templated": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api": {
+        "type": "http",
+        "in": "header",
+        "scheme": "basic"
+      }
+    }
+  }
+}
